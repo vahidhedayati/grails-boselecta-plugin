@@ -58,7 +58,7 @@ After plugin installtion we have on a gsp an initial backend  connection called 
 
 
 Example 1: Connector / selectPrimary into default g:select box.
-```
+```gsp
 <boselecta:connect
 user="randomUser"
 job="job1"
