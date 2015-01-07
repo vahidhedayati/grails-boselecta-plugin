@@ -11,10 +11,24 @@ This is a result of insecurity faced by many who used ajaxdependancyselection pl
 ###### Plugin will work with tomcat 7.0.54 + (inc. 8) running java 1.7+
 
 
-###### Dependency :
+###### Dependency : (once available) 
 ```groovy
 	compile ":boselect:0.1" 
 ```
+
+### Testing plugin 
+
+For now you can test it as an line plugin, please refer to [testbo demo project testing this plugin](https://github.com/vahidhedayati/testbo). It has all of the domainClasses and example gsp's in place. The BuildConfig.groovy has this plugin as an inline plugin. So with grails 2.4.4 :
+
+
+```
+git clone https://github.com/vahidhedayati/testbo.git
+git clone https://github.com/vahidhedayati/grails-boselecta-plugin.git
+cd testbo
+grails run-app
+```
+
+
 
 ###Config.groovy overrides:
 ```groovy
@@ -57,7 +71,7 @@ boselecta.socketProcessTemplate = '/path/to/process/template'
 After plugin installtion we have on a gsp an initial backend  connection called boselect:connect, followed by boselect:selectPrimary. initiall connnection sends a connection message - nothing useful the rest is done by taglib call below.
 
 
-Example 1: Connector / selectPrimary into default g:select box.
+Example 1: Connector / selectPrimary into default g:select box. (found in above testbo project)
 ```gsp
 <boselecta:connect
 user="randomUser"
@@ -89,7 +103,7 @@ secondaryValue='2'
 					
 ```
 
-Example 2:  Connector / primary / into Secondary into g:select:
+Example 2:  Connector / primary / into Secondary into g:select:  (found in above testbo project)
 
 ```gsp
 <boselecta:connect
@@ -98,12 +112,7 @@ job="job2"
 message="Woot we are connected"
  />
 
-  
-  
-  
-
  <form method=post action=example5>
-    
     
 <boselecta:selectPrimary id="MyContinent2" name="MyContinent2"
 job= "job2"
@@ -123,9 +132,6 @@ user="randomUser2"
     noSelection="['': 'Please choose Continent']" 
     setId="MyCountry11"
     />
-
-
-
 
 
 
