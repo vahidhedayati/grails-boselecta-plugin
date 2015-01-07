@@ -31,15 +31,24 @@ function processMessage( message) {
 
 		var itJson=isJson(jsonData.message);
 		if (itJson==true	) {
+		
 			var jsonData1 = JSON.parse(jsonData.message);
-			var setId=''
-				if (jsonData1.updateThisDiv!=null) {
-					setId=jsonData1.updateThisDiv
-				}
-
+			var setId,appendValue, appendName=''
+			
+			if (jsonData1.updateThisDiv!=null) {
+				setId=jsonData1.updateThisDiv
+			}
+			if (jsonData1.appendValue!=null) {
+				appendValue=jsonData1.appendValue
+			}
+			
+			if (jsonData1.appendName!=null) {
+				appendName=jsonData1.appendName
+			}
+			
 			if (jsonData1.result!=null) {
 
-				var id, name=''
+				var id, name='';
 					var rselect = document.getElementById(setId)
 					var l = rselect.length
 					while (l > 0) {
@@ -47,8 +56,21 @@ function processMessage( message) {
 						rselect.remove(l)
 					}
 
+				if (appendName!="") { 	
+					var opt = document.createElement('option');
+  						opt.value=appendValue;
+  						opt.text=appendName;
+  						try {
+						rselect.add(opt, null);
+						} catch(ex) {
+						rselect.add(opt);
+						}
+  					}
+  					
 				jsonData1.result.forEach(function(entry1) {
 					var opt = document.createElement('option');
+					
+  					
 					if (entry1.id!=null) {
 						id=entry1.id;
 					}

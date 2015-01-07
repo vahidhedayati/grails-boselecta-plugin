@@ -33,7 +33,7 @@ class BoSelectaTagLib implements ClientSessions {
 		String event =  attrs.remove('event')?.toString()
 		String context = attrs.remove('context')?.toString()
 		String addAppName = config.add.appName ?: 'yes'
-		
+
 		if (receivers) {
 			receivers = receivers as ArrayList
 		}
@@ -72,7 +72,11 @@ class BoSelectaTagLib implements ClientSessions {
 
 		// Make a socket connection as actual main user (backend connection)
 		Session oSession = clientListenerService.p_connect(uri, user, job)
-
+		
+		// Reset the map 
+		// TODO - fix this - if multiple calls of this one page is to be an option.  
+		clientListenerService.truncateStoredMap()
+		
 		Map model = [  message : message, job: job, hostname: hostname, actionMap: actionMap,
 			appName: appName, frontuser:frontuser,  user: user,  receivers: receivers, divId: divId,
 			chatApp: APP, addAppName: addAppName ]
@@ -107,7 +111,7 @@ class BoSelectaTagLib implements ClientSessions {
 		String user = attrs.remove('user')?.toString()
 		String id = attrs.remove('id')?.toString()
 		String domain = attrs.remove('domain')?.toString()
-		def noSelection = attrs.remove('noSelection')
+		//def noSelection = attrs.remove('noSelection')
 		String domain2 = attrs.remove('domain2')?.toString()
 		String bindid = attrs.remove('bindid')?.toString()
 		String searchField = attrs.remove('searchField')?.toString()
@@ -129,7 +133,7 @@ class BoSelectaTagLib implements ClientSessions {
 		if (!domain) {
 			throwTagError("Tag [selectPrimary] is missing required attribute [domain]")
 		}
-		if (!noSelection) {
+		if (!attrs.noSelection) {
 			throwTagError("Tag [selectPrimary] is missing required attribute [noSelection]")
 		}
 		
@@ -190,24 +194,27 @@ class BoSelectaTagLib implements ClientSessions {
 
 		def gsattrs=['optionKey' : "${collectField}" , 'optionValue': "${searchField}",
 			'id': "${id}", 'value': "${value}", 'name': "${name}"]
-
+		gsattrs['noSelection'] = attrs.noSelection
 		gsattrs['from'] = primarylist
 
 		if (requireField) {
 			gsattrs['required'] = 'required'
 		}
 
-		gsattrs['noSelection'] =attrs.noSelection
+		
+		
 
 		// Front End JAVA Script actioned by socketProcess gsp template
 		gsattrs['onchange'] = "javascript:actionThis(this.value, '${setId}', '${user}');"
+		
 
+		
 		out << g.select(gsattrs)
 
 		// Generate Message which is initial map containing default containing result set that then
 		// needs to be appended
 		def message = [setId: "${setId}", secondary: "${domain2}", collectfield: "${collectField2}",
-			searchField:  "${searchField2}"]
+			searchField:  "${searchField2}", appendValue: appendValue, appendName: appendName]
 		if (bindid) {
 			message.put('bindId', bindid)
 		}
@@ -295,11 +302,12 @@ class BoSelectaTagLib implements ClientSessions {
 
 		def gsattrs=['optionKey' : "${collectField}" , 'optionValue': "${searchField}",
 			'id': "${attrs.id}", 'value': "${attrs.value}", 'name': "${name}"]
+		gsattrs['noSelection'] = attrs.noSelection
 		gsattrs['from'] = secondarylist
 		if (requireField) {
 			gsattrs['required'] = 'required'
 		}
-		gsattrs['noSelection'] =attrs.noSelection
+		
 
 		// Front End JAVA Script actioned by socketProcess gsp template
 		gsattrs['onchange'] = "javascript:actionThis(this.value, '${setId}', '${user}');"
@@ -310,7 +318,7 @@ class BoSelectaTagLib implements ClientSessions {
 		// Generate Message which is initial map containing default containing result set that then
 		// needs to be appended
 		def message = [setId: "${setId}", secondary: "${domain2}", collectfield: "${collectField2}",
-			searchField:  "${searchField2}"]
+			searchField:  "${searchField2}", appendValue: appendValue, appendName: appendName]
 		if (bindid) {
 			message.put('bindId', bindid)
 		}

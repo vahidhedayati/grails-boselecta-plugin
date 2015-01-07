@@ -116,6 +116,9 @@ public class ClientListenerService extends ConfService implements UserSessions, 
 
 
 
+	public void truncateStoredMap() {
+		storedMap.clear()
+	}
 
 
 	Session p_connect(String _uri, String _username, String _room){

@@ -36,25 +36,9 @@ public class ClientProcessService extends ConfService implements ClientSessions 
 
 			String disconnect = rmesg.system
 			if (rmesg.privateMessage) {
-
 				JSONObject rmesg2=JSON.parse(rmesg.privateMessage)
 				checkMessage(userSession, username, rmesg2)
 				String command = rmesg2.command
-				if (command) {
-					String event,context=''
-					boolean strictMode, masterNode, autodisco, frontenduser = false
-					JSONArray data
-					JSONArray arguments = rmesg2.arguments as JSONArray
-					arguments.each { args ->
-						event = args.event
-						context = args.context
-						data = args.data
-					}
-					def jsonData = (data as JSON).toString()
-					if ( (event == "open_session")  || (autodisco == false)){
-						disco = false
-					}
-				}
 			}
 			if (disconnect && disconnect == "disconnect") {
 				clientListenerService.disconnect(userSession)
@@ -102,12 +86,14 @@ public class ClientProcessService extends ConfService implements ClientSessions 
 		String searchField = rmesg.searchField
 		String  setId = rmesg.setId
 		String bindId = rmesg.bindId
-
+		String appendValue = rmesg.appendValue
+		String appendName = rmesg.appendName
+	
 		String updateValue = rmesg.updateValue
 		String updateDiv = rmesg.updateDiv
 
 		if (setId) {
-			def myMap = [setId: setId,  secondary: secondary,collectfield:collectfield, searchField:searchField, bindId:bindId ]
+			def myMap = [setId: setId,  secondary: secondary,collectfield:collectfield, searchField:searchField, bindId:bindId, appendValue:appendValue, appendName:appendName  ]
 			storedMap.add(myMap)
 		}else if (updateValue) {
 			Map currentSelection = [:]
@@ -128,12 +114,16 @@ public class ClientProcessService extends ConfService implements ClientSessions 
 								searchField = v
 							}else if (k=="bindId") {
 								bindId = v
+							}else if (k=="appendValue") {
+								appendValue = v
+							}else if (k=="appendName") {
+								appendName = v
 							}
 						}
 					}
 					if (go) {
 						ArrayList result = autoCompleteService.selectDomainClass(secondary, collectfield, searchField, bindId, updateValue )
-						JSON mresult = ([ result: result, 'updateThisDiv': updateDiv]) as JSON
+						JSON mresult = ([ result: result, updateThisDiv: updateDiv, appendName: appendName, appendName: appendName ]) as JSON
 						clientListenerService.sendFrontEndPM(userSession, username,mresult as String)
 
 					}
