@@ -52,7 +52,7 @@ class BoSelectaTagLib implements ClientSessions {
 		if (actionMap) {
 			actionMap = actionMap as Map
 		}
-		String dbSupport = config.dbsupport ?: 'yes'
+	
 
 		if (!appName) {
 			appName = grailsApplication.metadata['app.name']
@@ -82,7 +82,7 @@ class BoSelectaTagLib implements ClientSessions {
 			chatApp: APP, addAppName: addAppName ]
 
 
-		String userTemplate = attrs.socketProcessTemplate ?: config.socketProcessTemplate ?: ''
+		String userTemplate = attrs.socketConnectTemplate ?: config.socketConnectTemplate ?: ''
 		String defaultTemplate= "/${VIEW}/socketConnect"
 
 		// Now load up the socketProcess template - which does the front end connection
@@ -189,7 +189,7 @@ class BoSelectaTagLib implements ClientSessions {
 
 		List primarylist = autoCompleteService.returnPrimaryList(domain)
 
-		String userTemplate = attrs.socketConnectTemplate ?: config.socketConnectTemplate ?: ''
+		String userTemplate = attrs.socketProcessTemplate ?: config.socketProcessTemplate ?: ''
 		String defaultTemplate = "/${VIEW}/socketProcess"
 
 		if (userTemplate) {

@@ -6,6 +6,52 @@ Grails websocket Multi select plugin, a secure way of interacting with multi dom
 This is a result of insecurity faced by many who used ajaxdependancyselection plugin.
 
 
+ Websocket chat can be incorporated to an existing grails app running ver 2>+. Supports both resource (pre 2.4) /assets (2.4+) based grails sites.
+
+###### Plugin will work with tomcat 7.0.54 + (inc. 8) running java 1.7+
+
+
+###### Dependency :
+```groovy
+	compile ":boselect:0.1" 
+```
+
+###Config.groovy overrides:
+```groovy
+
+/*
+* Very very optional values defaults are as per below _frontend and yes adds localhost:8080/yourappName/ to websocket connection line
+*/
+boselecta.frontenduser = '_frontend'
+boselecta.add.appName = 'yes'
+
+
+/*
+* The 3 items below can be either provided by Config.groovy or remove boselecta and add items to taglib calls 
+*/ 
+
+
+/*
+* Websocket hostname by default is localhost:8080
+* <boselect:connect hostname='something'.... /> 
+*/
+boselecta.hostname = 'your websockethostname'
+
+/*
+* Websocket _socketConnect by default is {/plugin/views}/boselecta/_socketConnect.gsp
+*<boselect:connect socketConnectTemplate='something'.... /> 
+*/
+boselecta.socketConnectTemplate = '/path/to/process/template'
+ 
+ /*
+ * Websocket socketProcessTemplate by default is {/plugin/views}/boselecta/_socketProcess.gsp
+ *<boselect:selectPrimary socketProcessTemplate='something'.... /> 
+ */
+boselecta.socketProcessTemplate = '/path/to/process/template'
+
+
+```
+
 
 ##### grails Bo Select Plugin usage:
 After plugin installtion we have on a gsp an initial backend  connection called boselect:connect, followed by boselect:selectPrimary. initiall connnection sends a connection message - nothing useful the rest is done by taglib call below.
@@ -133,16 +179,6 @@ user="randomUser2"
     <input type=submit value=go>  
     </form>
 
-```
-
- Websocket chat can be incorporated to an existing grails app running ver 2>+. Supports both resource (pre 2.4) /assets (2.4+) based grails sites.
-
-###### Plugin will work with tomcat 7.0.54 + (inc. 8) running java 1.7+
-
-
-###### Dependency :
-```groovy
-	compile ":boselect:0.1" 
 ```
 
 
