@@ -6,7 +6,8 @@ Grails websocket Multi select plugin, a secure way of interacting with multi dom
 This is a result of insecurity faced by many who used [ajaxdependancyselection plugin](https://github.com/vahidhedayati/ajaxdependancyselection). 
 
 
- 
+ ### Video
+ [Video 1 Basic tutorial](https://www.youtube.com/watch?v=wZJl-pPPlOA) 
 
 
  BoSelecta can be incorporated to an existing grails app running ver 2>+. Supports both resource (pre 2.4) /assets (2.4+) based grails sites.
