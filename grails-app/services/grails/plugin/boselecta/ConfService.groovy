@@ -16,18 +16,7 @@ class ConfService {
 		return Boolean.valueOf(input ?: false)
 	}
 
-
-	Boolean isAdmin(Session userSession) {
-		Boolean useris = false
-		String userLevel = userSession.userProperties.get("userLevel") as String
-		if (userLevel.toString().toLowerCase().startsWith('admin')) {
-			useris = true
-		}
-		return useris
-	}
-
 	String getFrontend() {
-
 		return config.frontenduser ?: '_frontend'
 	}
 

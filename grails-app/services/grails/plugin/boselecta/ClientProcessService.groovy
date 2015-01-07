@@ -83,27 +83,15 @@ public class ClientProcessService extends ConfService implements ClientSessions 
 						clientListenerService.sendPM(userSession, msgFrom,"close_connection")
 					}
 				}else{
-					// THIS IS AN EXAMPLE
-					//if (actionthis == "do_something") {
-					//	if (pm) {
-					//		clientListenerService.sendPM(userSession, msgFrom,"[PROCESSED]${actionthis}")
-					//	}else{
-					//		clientListenerService.sendMessage(userSession, ">>HAVE DONE \n"+actionthis)
-					//	}
-					//}else{
-
 					if (!msgFrom.endsWith(username)) {
 						clientListenerService.sendBackEndPM(userSession, username,actionthis)
 					}
-
 					if (disco) {
 						clientListenerService.disconnect(userSession)
 
 					}
-					//}
 				}
 			}
-
 		}
 	}
 
@@ -144,28 +132,13 @@ public class ClientProcessService extends ConfService implements ClientSessions 
 						}
 					}
 					if (go) {
-						// currentSelection = [secondary: secondary,  collectfield:collectfield,searchField:searchField,bindId:bindId ]
 						ArrayList result = autoCompleteService.selectDomainClass(secondary, collectfield, searchField, bindId, updateValue )
 						JSON mresult = ([ result: result, 'updateThisDiv': updateDiv]) as JSON
 						clientListenerService.sendFrontEndPM(userSession, username,mresult as String)
 
 					}
 				}
-
-
-
 			}
-
-			/*if (currentSelection) {
-			 def secondary1 = currentSelection.secondary
-			 def collectfield1 = currentSelection.collectfield
-			 def searchField1 = currentSelection.searchField
-			 def bindId1 =currentSelection.bindId
-			 ArrayList result = autoCompleteService.selectDomainClass(secondary1, collectfield1, searchField1, bindId1, updateValue )
-			 JSON mresult = ([ result: result, 'updateThisDiv': updateDiv]) as JSON
-			 clientListenerService.sendFrontEndPM(userSession, username,mresult as String)
-			 }*/
-
 		}
 	}
 

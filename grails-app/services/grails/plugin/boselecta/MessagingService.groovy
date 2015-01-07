@@ -24,23 +24,21 @@ class MessagingService extends ConfService  implements UserSessions {
 		def myMsgj = (msg as JSON).toString()
 		sendMsg(userSession, myMsgj)
 	}
-	def privateMessage1(Session userSession,String user,String msg) {
+	
+	def privateMessage(Session userSession,String user,String msg) {
 		def myMsg = [:]
 		String urecord = userSession.userProperties.get("username") as String
 		Boolean found = false
-
 		try {
 			synchronized (jobUsers) {
 				jobUsers?.each { crec->
 					if (crec && crec.isOpen()) {
 						def cuser = crec.userProperties.get("username").toString()
 						if (cuser.equals(user)) {
-
 							found = true
 							crec.basicRemote.sendText(msg as String)
 							myMsg.put("message","--> PM sent to ${user}")
 							messageUser(userSession,myMsg)
-
 						}
 					}
 				}
@@ -48,53 +46,8 @@ class MessagingService extends ConfService  implements UserSessions {
 		} catch (IOException e) {
 			log.error ("onMessage failed", e)
 		}
-
-	}
-	def privateMessage(Session userSession,String user,Map msg) {
-		def myMsg = [:]
-		def myMsgj = msg as JSON
-		String urecord = userSession.userProperties.get("username") as String
-		Boolean found = false
-
-		try {
-			synchronized (jobUsers) {
-				jobUsers?.each { crec->
-					if (crec && crec.isOpen()) {
-						def cuser = crec.userProperties.get("username").toString()
-						if (cuser.equals(user)) {
-
-							found = true
-							crec.basicRemote.sendText(myMsgj as String)
-							myMsg.put("message","--> PM sent to ${user}")
-							messageUser(userSession,myMsg)
-
-						}
-					}
-				}
-			}
-		} catch (IOException e) {
-			log.error ("onMessage failed", e)
-		}
-
 	}
 
-
-
-
-	def broadcast2all(Map msg) {
-		def myMsgj = msg as JSON
-		try {
-			synchronized (jobUsers) {
-				jobUsers?.each { crec->
-					if (crec && crec.isOpen()) {
-						crec.basicRemote.sendText(myMsgj as String);
-					}
-				}
-			}
-		} catch (IOException e) {
-			log.error ("onMessage failed", e)
-		}
-	}
 
 	def broadcast(Session userSession,Map msg) {
 		def myMsgj = msg as JSON
@@ -113,8 +66,5 @@ class MessagingService extends ConfService  implements UserSessions {
 		}
 	}
 
-	def jsonmessageUser(Session userSession,String msg) {
-		userSession.basicRemote.sendText(msg as String)
-	}
 
 }

@@ -59,36 +59,11 @@ public class ClientListenerService extends ConfService implements UserSessions, 
 		}
 	}
 
-	def sendJobPM(String job,String message) {
-		try {
-			synchronized (jobUsers) {
-				jobUsers?.each { crec->
-					if (crec && crec.isOpen()) {
-						String cuser = crec.userProperties.get("username") as String
-						String cjob =  crec.userProperties.get("job") as String
-						boolean found = false
-						if (job==cjob) {
-							found=findUser(cuser)
-							if (found) {
-								crec.basicRemote.sendText("/pm ${cuser},${message}")
-							}
-							if (!cuser.toString().endsWith(frontend)) {
-								found=findUser(cuser+frontend)
-								if (found) {
-									crec.basicRemote.sendText("/pm ${cuser+frontend},${message}")
-								}
-							}
-						}
-					}
-				}
-			}
-		} catch (IOException e) {
-			log.error ("onMessage failed", e)
-		}
-	}
-
+	
 	def sendFrontEndPM(Session userSession, String user,String message) {
 		userSession.basicRemote.sendText("/pm ${user+frontend},${message}")
+		// TODO
+		// Should work with above call  - take a look at this
 		userSession.basicRemote.sendText("${message}")
 	}
 
@@ -97,7 +72,6 @@ public class ClientListenerService extends ConfService implements UserSessions, 
 			user=user.substring(0,user.indexOf(frontend))
 		}
 		userSession.basicRemote.sendText("/pm ${user},${message}")
-		//userSession.basicRemote.sendText("${message}")
 	}
 
 	def sendPM(Session userSession, String user,String message) {

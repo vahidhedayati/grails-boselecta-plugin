@@ -15,7 +15,6 @@ class BoSelectaTagLib implements ClientSessions {
 	def autoCompleteService
 
 
-
 	def connect  =  { attrs ->
 		def job = attrs.remove('job')?.toString()
 		def actionMap = attrs.remove('actionMap')
@@ -34,36 +33,34 @@ class BoSelectaTagLib implements ClientSessions {
 		String event =  attrs.remove('event')?.toString()
 		String context = attrs.remove('context')?.toString()
 		String addAppName = config.add.appName ?: 'yes'
+		
 		if (receivers) {
 			receivers = receivers as ArrayList
 		}
+		
 		if (jsonData) {
 			if(jsonData instanceof String) {
 				jsonData =JSON.parse(jsonData)
 			}
 			jsonData = jsonData as JSON
 		}
-
+		
 		String frontuser=user+frontend
 		if (receivers &&  (receivers instanceof ArrayList) ) {
 			receivers.add(frontuser)
 		}
-
+		
 		if (actionMap) {
 			actionMap = actionMap as Map
 		}
-	
-
+		
 		if (!appName) {
 			appName = grailsApplication.metadata['app.name']
 		}
-
+		
 		if (!hostname) {
 			hostname = config.hostname ?: 'localhost:8080'
 		}
-
-
-
 		if (!message) {
 			message = "testing"
 		}
@@ -73,14 +70,12 @@ class BoSelectaTagLib implements ClientSessions {
 			uri="ws://${hostname}/${APP}/"
 		}
 
-
 		// Make a socket connection as actual main user (backend connection)
 		Session oSession = clientListenerService.p_connect(uri, user, job)
 
 		Map model = [  message : message, job: job, hostname: hostname, actionMap: actionMap,
 			appName: appName, frontuser:frontuser,  user: user,  receivers: receivers, divId: divId,
 			chatApp: APP, addAppName: addAppName ]
-
 
 		String userTemplate = attrs.socketConnectTemplate ?: config.socketConnectTemplate ?: ''
 		String defaultTemplate= "/${VIEW}/socketConnect"
@@ -91,8 +86,6 @@ class BoSelectaTagLib implements ClientSessions {
 		}else{
 			out << g.render(contextPath: pluginContextPath, template: defaultTemplate, model: model)
 		}
-
-
 		if (sendType == 'message') {
 			if (receivers) {
 				clientListenerService.sendArrayPM(oSession, job, message)
@@ -132,18 +125,18 @@ class BoSelectaTagLib implements ClientSessions {
 		if (!id) {
 			throwTagError("Tag [selectPrimary] is missing required attribute [id]")
 		}
-
+		
 		if (!domain) {
 			throwTagError("Tag [selectPrimary] is missing required attribute [domain]")
 		}
-
 		if (!noSelection) {
 			throwTagError("Tag [selectPrimary] is missing required attribute [noSelection]")
 		}
-
+		
 		if (!domain2) {
 			throwTagError("Tag [selectPrimary] is missing required attribute [domain2]")
 		}
+		
 		if (!bindid) {
 			throwTagError("Tag [selectPrimary] is missing required attribute [bindid]")
 		}
@@ -151,18 +144,18 @@ class BoSelectaTagLib implements ClientSessions {
 		if (!searchField) {
 			throwTagError("Tag [selectPrimary] is missing required attribute [searchField]")
 		}
+		
 		if (!collectField) {
 			collectField = searchField
 		}
 		if (!collectField2) {
 			collectField2=collectField
 		}
+		
 		if (!searchField2) {
 			searchField2=searchField
 		}
 		
-		
-
 		if (!setId) {
 			setId = "selectPrimary"
 		}
@@ -170,22 +163,19 @@ class BoSelectaTagLib implements ClientSessions {
 		if (attrs.class) {
 			clazz = " class='${attrs.class}'"
 		}
-
+		
 		if (!name) {
 			name = id
 		}
-
-
-
+		
 		if ((appendValue)&&(!appendName)) {
 			appendName='Values Updated'
 		}
+		
 		Boolean requireField=true
-
 		if (require) {
 			requireField=require
 		}
-
 
 		List primarylist = autoCompleteService.returnPrimaryList(domain)
 
@@ -198,7 +188,6 @@ class BoSelectaTagLib implements ClientSessions {
 			out << g.render(contextPath: pluginContextPath, template: defaultTemplate, model: [attrs:attrs])
 		}
 
-
 		def gsattrs=['optionKey' : "${collectField}" , 'optionValue': "${searchField}",
 			'id': "${id}", 'value': "${value}", 'name': "${name}"]
 
@@ -208,14 +197,11 @@ class BoSelectaTagLib implements ClientSessions {
 			gsattrs['required'] = 'required'
 		}
 
-
 		gsattrs['noSelection'] =attrs.noSelection
-
 
 		// Front End JAVA Script actioned by socketProcess gsp template
 		gsattrs['onchange'] = "javascript:actionThis(this.value, '${setId}', '${user}');"
 
-		
 		out << g.select(gsattrs)
 
 		// Generate Message which is initial map containing default containing result set that then
@@ -227,7 +213,6 @@ class BoSelectaTagLib implements ClientSessions {
 		}
 		def cc=message as JSON
 		clientListenerService.sendJobMessage(job, cc as String)
-
 	}
 
 
@@ -237,7 +222,7 @@ class BoSelectaTagLib implements ClientSessions {
 		String user = attrs.remove('user')?.toString()
 		String job = attrs.remove('job')?.toString()
 		String bindid = attrs.remove('bindid')?.toString()
-		
+
 		String searchField = attrs.remove('searchField')?.toString()
 		String searchField2 = attrs.remove('searchField2')?.toString()
 		String collectField = attrs.remove('collectField')?.toString()
@@ -247,7 +232,7 @@ class BoSelectaTagLib implements ClientSessions {
 		String appendName = attrs.remove('appendName')?.toString()
 		String value = attrs.remove('value')?.toString()
 		String appendValue = attrs.remove('appendValue')?.toString()
-		
+
 		boolean require = attrs.remove('require')?.toBoolean() ?: false
 		if (!searchField2) {
 			throwTagError("Tag [selectPrimary] is missing required attribute [searchField2]")
@@ -256,14 +241,14 @@ class BoSelectaTagLib implements ClientSessions {
 		if (!collectField2) {
 			collectField2=searchField2
 		}
+		
 		if (!collectField) {
 			collectField = collectField2
 		}
+		
 		if (!searchField) {
 			searchField=searchField2
 		}
-
-		
 		
 		if (!attrs.id) {
 			throwTagError("Tag [selectScondary] is missing required attribute [id]")
@@ -272,49 +257,54 @@ class BoSelectaTagLib implements ClientSessions {
 		if (!attrs.controller)  {
 			attrs.controller= "autoComplete"
 		}
+		
 		if (!attrs.action) {
 			attrs.action= "ajaxSelectSecondary"
 		}
+		
 		if (!attrs.noSelection) {
 			throwTagError("Tag [selectScondary] is missing required attribute [noSelection]")
 		}
+		
 		if (!setId) {
 			setId = "selectSecondary"
 		}
-	
 		
 		if (attrs.class) {
 			clazz = " class='${attrs.class}'"
 		}
+		
 		if (attrs.name) {
 			name = "${attrs.name}"
 		} else {
 			name = "${attrs.id}"
 		}
+		
 		if ((appendValue)&&(!appendName)) {
 			appendName='Values Updated'
 		}
+		
 		Boolean requireField=true
 
 		if (require) {
 			requireField=require
 		}
-		
+
 		List secondarylist=[]
 
-	
+
 		def gsattrs=['optionKey' : "${collectField}" , 'optionValue': "${searchField}",
-			 'id': "${attrs.id}", 'value': "${attrs.value}", 'name': "${name}"]
+			'id': "${attrs.id}", 'value': "${attrs.value}", 'name': "${name}"]
 		gsattrs['from'] = secondarylist
 		if (requireField) {
 			gsattrs['required'] = 'required'
 		}
 		gsattrs['noSelection'] =attrs.noSelection
-		
+
 		// Front End JAVA Script actioned by socketProcess gsp template
 		gsattrs['onchange'] = "javascript:actionThis(this.value, '${setId}', '${user}');"
 
-		
+
 		out << g.select(gsattrs)
 
 		// Generate Message which is initial map containing default containing result set that then
@@ -327,7 +317,6 @@ class BoSelectaTagLib implements ClientSessions {
 		def cc=message as JSON
 		clientListenerService.sendJobMessage(job, cc as String)
 	}
-
 
 	private String getFrontend() {
 		def cuser=config.frontenduser ?: '_frontend'

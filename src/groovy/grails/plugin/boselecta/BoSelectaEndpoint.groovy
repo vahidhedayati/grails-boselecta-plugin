@@ -117,11 +117,11 @@ class BoSelectaEndpoint  implements ServletContextListener, UserSessions {
 
 				if (!user.equals(username)) {
 
-					messagingService.privateMessage1(userSession, user,msg)
+					messagingService.privateMessage(userSession, user,msg)
 				}else{
 					myMsg.put("message","Private message self?")
 					messagingService.messageUser(userSession,myMsg)
-					//messagingService.privateMessage(userSession, user,msg)
+
 				}
 			}else{
 

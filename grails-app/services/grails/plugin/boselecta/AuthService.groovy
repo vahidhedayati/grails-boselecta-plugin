@@ -9,28 +9,22 @@ import javax.websocket.Session
 class AuthService extends ConfService implements UserSessions  {
 
 	def messagingService
-	def userService
 
 
 	public void connectUser(String message,Session userSession,String room) {
 		def myMsg = [:]
-
 		String connector = "CONN:-"
 		def user
 		def username = message.substring(message.indexOf(connector)+connector.length(),message.length()).trim().replace(' ', '_').replace('.', '_')
-
 		if (loggedIn(username)==false) {
 			userSession.userProperties.put("username", username)
 			def myMsg2 = [:]
-
 		}else{
 			myMsg.put("message", "${username} is already loggged in elsewhere, action denied")
 		}
-
 		if (myMsg) {
 			messagingService.broadcast(userSession,myMsg)
 		}
-
 	}
 
 
