@@ -206,8 +206,30 @@ class BoSelectaTagLib implements ClientSessions {
 		// Front End JAVA Script actioned by socketProcess gsp template
 		gsattrs['onchange'] = "javascript:actionThis(this.value, '${setId}', '${user}', '${job}');"
 		
-		
-		
+		// Parse taglib call for domain3..domain9 and its setId's searchField and collectFields.....
+		// Add to a map called multiDomainMap
+		int a=3
+		def multiDomainMap = [:]
+		while (a < 10 ) {
+			 //setId3 ..setId9
+			String sId = attrs.remove('setId'+a)?.toString()
+			// searchField3 .. searchField9
+			String sf=attrs.remove('searchField'+a)?.toString()
+			// collectField3 .. collectField9
+			String cf=attrs.remove('collectField'+a)?.toString()
+			// domain3 .. domain9
+			String dom = attrs.remove('domain'+a)?.toString()
+			
+			// domain3 .. domain9
+			String bindit = attrs.remove('bindid'+a)?.toString()
+			
+			if (sId && dom) {
+				multiDomainMap+=[ "setId${a}": sId, "searchField${a}" : sf, "collectField${a}": cf,
+					 "domain${a}": dom, "bindId${a}": bindit]
+			}
+			a++
+		}
+
 		out << g.select(gsattrs)
 
 
@@ -215,6 +237,11 @@ class BoSelectaTagLib implements ClientSessions {
 		// needs to be appended
 		def message = [setId: "${setId}", secondary: "${domain2}", collectfield: "${collectField2}",
 			searchField:  "${searchField2}", appendValue: appendValue, appendName: appendName, job:job]
+		
+		if (multiDomainMap) {
+			message += multiDomainMap
+		}
+		
 		if (bindid) {
 			message.put('bindId', bindid)
 		}
