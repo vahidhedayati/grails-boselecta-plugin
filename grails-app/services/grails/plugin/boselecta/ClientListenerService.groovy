@@ -116,8 +116,20 @@ public class ClientListenerService extends ConfService implements UserSessions, 
 
 
 
-	public void truncateStoredMap() {
-		storedMap.clear()
+	public void truncateStoredMap(String job) {
+		if (storedMap) {
+			cloneMap.clear()
+			boolean go = false
+			storedMap?.each { s ->
+				if (s && (s.jobName != job)) {
+					cloneMap.add(s)
+				}
+			}
+			storedMap.clear()
+			cloneMap.each { s ->
+				storedMap.add(s)
+			}
+		}
 	}
 
 

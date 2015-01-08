@@ -27,13 +27,11 @@ function processMessage( message) {
 	var jsonData = JSON.parse(message.data);
 	if (jsonData.message!=null) {
 
-
-
 		var itJson=isJson(jsonData.message);
 		if (itJson==true	) {
 		
 			var jsonData1 = JSON.parse(jsonData.message);
-			var setId,appendValue, appendName=''
+			var setId,appendValue, appendName, updated=''
 			
 			if (jsonData1.updateThisDiv!=null) {
 				setId=jsonData1.updateThisDiv
@@ -46,6 +44,10 @@ function processMessage( message) {
 				appendName=jsonData1.appendName
 			}
 			
+			if (jsonData1.updated!=null) {
+				updated=jsonData1.updated
+			}
+			
 			if (jsonData1.result!=null) {
 
 				var id, name='';
@@ -56,7 +58,7 @@ function processMessage( message) {
 						rselect.remove(l)
 					}
 
-				if (appendName!="") { 	
+				if ((appendName!="")&&(updated=="yes")) { 	
 					var opt = document.createElement('option');
   						opt.value=appendValue;
   						opt.text=appendName;
@@ -138,7 +140,6 @@ function addUser(uid) {
 
 function processClose(message) {
 	webSocket.send("DISCO:-"+user);
-	$('#chatMessages').append(user+" disconnecting from server... \n");
 	console.log('Closing');
 	webSocket.close();
 }
@@ -150,7 +151,6 @@ function processOpen(message) {
 	webSocket.send("CONN:-${frontuser}");
 	</g:if>
 	<g:else>
-	$('#chatMessages').append("Chat denied no username \n");
 	webSocket.send("DISCO:-");
 	webSocket.close();
 	</g:else>

@@ -74,8 +74,7 @@ class BoSelectaTagLib implements ClientSessions {
 		Session oSession = clientListenerService.p_connect(uri, user, job)
 		
 		// Reset the map 
-		// TODO - fix this - if multiple calls of this one page is to be an option.  
-		clientListenerService.truncateStoredMap()
+		clientListenerService.truncateStoredMap(job)
 		
 		Map model = [  message : message, job: job, hostname: hostname, actionMap: actionMap,
 			appName: appName, frontuser:frontuser,  user: user,  receivers: receivers, divId: divId,
@@ -100,6 +99,16 @@ class BoSelectaTagLib implements ClientSessions {
 		if (autodisco) {
 			clientListenerService.disconnect(oSession)
 		}else{
+		}
+		
+		
+		userTemplate = attrs.socketProcessTemplate ?: config.socketProcessTemplate ?: ''
+		defaultTemplate = "/${VIEW}/socketProcess"
+
+		if (userTemplate) {
+			out << g.render(template:userTemplate)
+		}else{
+			out << g.render(contextPath: pluginContextPath, template: defaultTemplate)
 		}
 
 	}
@@ -183,14 +192,7 @@ class BoSelectaTagLib implements ClientSessions {
 
 		List primarylist = autoCompleteService.returnPrimaryList(domain)
 
-		String userTemplate = attrs.socketProcessTemplate ?: config.socketProcessTemplate ?: ''
-		String defaultTemplate = "/${VIEW}/socketProcess"
-
-		if (userTemplate) {
-			out << g.render(template:userTemplate, model: [attrs:attrs])
-		}else{
-			out << g.render(contextPath: pluginContextPath, template: defaultTemplate, model: [attrs:attrs])
-		}
+	
 
 		def gsattrs=['optionKey' : "${collectField}" , 'optionValue': "${searchField}",
 			'id': "${id}", 'value': "${value}", 'name': "${name}"]
@@ -200,26 +202,50 @@ class BoSelectaTagLib implements ClientSessions {
 		if (requireField) {
 			gsattrs['required'] = 'required'
 		}
-
 		
-		
-
 		// Front End JAVA Script actioned by socketProcess gsp template
-		gsattrs['onchange'] = "javascript:actionThis(this.value, '${setId}', '${user}');"
+		gsattrs['onchange'] = "javascript:actionThis(this.value, '${setId}', '${user}', '${job}');"
 		
-
+		
 		
 		out << g.select(gsattrs)
+
 
 		// Generate Message which is initial map containing default containing result set that then
 		// needs to be appended
 		def message = [setId: "${setId}", secondary: "${domain2}", collectfield: "${collectField2}",
-			searchField:  "${searchField2}", appendValue: appendValue, appendName: appendName]
+			searchField:  "${searchField2}", appendValue: appendValue, appendName: appendName, job:job]
 		if (bindid) {
 			message.put('bindId', bindid)
 		}
 		def cc=message as JSON
 		clientListenerService.sendJobMessage(job, cc as String)
+		
+	
+		/*
+		String userTemplate = attrs.socketProcessTemplate ?: config.socketProcessTemplate ?: ''
+		String defaultTemplate = "/${VIEW}/socketProcess"
+
+		if (userTemplate) {
+			out << g.render(template:userTemplate, model: [id:id])
+		}else{
+			out << g.render(contextPath: pluginContextPath, template: defaultTemplate, model: [id:id])
+		}
+		*/
+		
+		
+		if (value) {
+			// Sleep added for :
+			//  Uncaught InvalidStateError: Failed to execute 'send' on 'WebSocket': Still in CONNECTING state.
+			out << """
+					<script type="text/javascript">
+						setTimeout(function(){
+							actionNonAppendThis('${value}', '${setId}', '${user}', '${job}');
+						},600);
+					</script>
+			"""
+
+		}
 	}
 
 
@@ -229,7 +255,7 @@ class BoSelectaTagLib implements ClientSessions {
 		String user = attrs.remove('user')?.toString()
 		String job = attrs.remove('job')?.toString()
 		String bindid = attrs.remove('bindid')?.toString()
-
+		String id = attrs.remove('id')?.toString()
 		String searchField = attrs.remove('searchField')?.toString()
 		String searchField2 = attrs.remove('searchField2')?.toString()
 		String collectField = attrs.remove('collectField')?.toString()
@@ -257,7 +283,7 @@ class BoSelectaTagLib implements ClientSessions {
 			searchField=searchField2
 		}
 		
-		if (!attrs.id) {
+		if (!id) {
 			throwTagError("Tag [selectScondary] is missing required attribute [id]")
 		}
 		
@@ -284,7 +310,7 @@ class BoSelectaTagLib implements ClientSessions {
 		if (attrs.name) {
 			name = "${attrs.name}"
 		} else {
-			name = "${attrs.id}"
+			name = "${id}"
 		}
 		
 		if ((appendValue)&&(!appendName)) {
@@ -301,7 +327,7 @@ class BoSelectaTagLib implements ClientSessions {
 
 
 		def gsattrs=['optionKey' : "${collectField}" , 'optionValue': "${searchField}",
-			'id': "${attrs.id}", 'value': "${attrs.value}", 'name': "${name}"]
+			'id': id, 'value': "${attrs.value}", 'name': "${name}"]
 		gsattrs['noSelection'] = attrs.noSelection
 		gsattrs['from'] = secondarylist
 		if (requireField) {
@@ -310,7 +336,7 @@ class BoSelectaTagLib implements ClientSessions {
 		
 
 		// Front End JAVA Script actioned by socketProcess gsp template
-		gsattrs['onchange'] = "javascript:actionThis(this.value, '${setId}', '${user}');"
+		gsattrs['onchange'] = "javascript:actionThis(this.value, '${setId}', '${user}', '${job}');"
 
 
 		out << g.select(gsattrs)
@@ -318,12 +344,25 @@ class BoSelectaTagLib implements ClientSessions {
 		// Generate Message which is initial map containing default containing result set that then
 		// needs to be appended
 		def message = [setId: "${setId}", secondary: "${domain2}", collectfield: "${collectField2}",
-			searchField:  "${searchField2}", appendValue: appendValue, appendName: appendName]
+			searchField:  "${searchField2}", appendValue: appendValue, appendName: appendName, job:job]
 		if (bindid) {
 			message.put('bindId', bindid)
 		}
 		def cc=message as JSON
 		clientListenerService.sendJobMessage(job, cc as String)
+		
+
+		
+		if (value) {
+		out << """
+					<script type="text/javascript">
+						setTimeout(function(){
+							actionNonAppendThis('${value}', '${setId}', '${user}', '${job}');
+						},600);
+					</script>
+			"""
+		}
+		
 	}
 
 	private String getFrontend() {

@@ -5,7 +5,6 @@ import grails.plugin.boselecta.interfaces.ClientSessions
 
 import javax.websocket.Session
 
-import org.codehaus.groovy.grails.web.json.JSONArray
 import org.codehaus.groovy.grails.web.json.JSONObject
 
 public class ClientProcessService extends ConfService implements ClientSessions {
@@ -88,49 +87,77 @@ public class ClientProcessService extends ConfService implements ClientSessions 
 		String bindId = rmesg.bindId
 		String appendValue = rmesg.appendValue
 		String appendName = rmesg.appendName
-	
+		String jobName = rmesg.job
+
+
+		String cjobName = rmesg.cjobName
 		String updateValue = rmesg.updateValue
 		String updateDiv = rmesg.updateDiv
+		String updated = rmesg.updated ?: 'yes'
 
 		if (setId) {
-			def myMap = [setId: setId,  secondary: secondary,collectfield:collectfield, searchField:searchField, bindId:bindId, appendValue:appendValue, appendName:appendName  ]
+			def myMap = [jobName: jobName, setId: setId,  secondary: secondary,collectfield:collectfield, searchField:searchField, bindId:bindId, appendValue:appendValue, appendName:appendName  ]
+			//storeThisMap(myMap)
 			storedMap.add(myMap)
+			//storedMap.put(jobName,myMap)
+
 		}else if (updateValue) {
 			Map currentSelection = [:]
 			if (storedMap) {
 				boolean go = false
-				storedMap.each { s->
+
+				storedMap.each { s ->
 					go = false
-					s.each {  k,v ->
-						if (k == "setId" && v == updateDiv) {
-							go = true
-						}
-						if (go) {
-							if (k=="secondary") {
-								secondary = v
-							} else if (k=="collectfield") {
-								collectfield = v
-							}else if (k=="searchField") {
-								searchField = v
-							}else if (k=="bindId") {
-								bindId = v
-							}else if (k=="appendValue") {
-								appendValue = v
-							}else if (k=="appendName") {
-								appendName = v
-							}
-						}
+					if (s.setId == updateDiv) {
+						go = true
+						secondary = s.secondary
+						collectfield = s.collectfield
+						searchField = s.searchField
+						bindId = s.bindId
+						appendValue = s.appendValue
+						appendName = s.appendName
 					}
 					if (go) {
 						ArrayList result = autoCompleteService.selectDomainClass(secondary, collectfield, searchField, bindId, updateValue )
-						JSON mresult = ([ result: result, updateThisDiv: updateDiv, appendName: appendName, appendName: appendName ]) as JSON
+						JSON mresult = ([ result: result, updateThisDiv: updateDiv, appendName: appendName, appendName: appendName, updated:updated ]) as JSON
 						clientListenerService.sendFrontEndPM(userSession, username,mresult as String)
 
 					}
 				}
+				/* 
+				 storedMap.each { s,v ->
+				 if (v.setId==updateDiv && s== cjobName) {
+				 go = true
+				 secondary = v.secondary 
+				 collectfield =v.collectfield
+				 searchField = v.searchField
+				 bindId = v.bindId
+				 appendValue = v.appendValue
+				 appendName = v.appendName
+				 }
+				 }
+				 */
 			}
 		}
 	}
+	/*
+	 * 
+	private void storeThisMap(Map myMap) {
+		boolean go = true
+		if (storedMap) {
+			storedMap.each { s ->
+				if  ( (s.jobName == myMap.jobName) &&  (s.setId == myMap.setId ) && (s.secondary == myMap.secondary )) {
+					go = false;
+				}
+				if (go) {
+					storedMap.add(myMap)
+				}
+			}
 
+		}else{
+			storedMap.add(myMap)
+		}
+	}
+	*/
 }
 

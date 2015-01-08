@@ -1,7 +1,15 @@
+
+
 <g:javascript>
-
-
-function actionThis(value, divid, user) {
-	webSocket.send("/pm "+user+","+JSON.stringify({updateDiv : divid, updateValue : value}));
+function actionThis(value, divid, user, cjobName) {
+	webSocket.send("/pm "+user+","+JSON.stringify({updateDiv : divid, updateValue : value, cjobName: cjobName}));
 }
+
+function actionNonAppendThis(value, divid, user, cjobName) {
+	webSocket.send("/pm "+user+","+JSON.stringify({updateDiv : divid, updateValue : value, updated: 'no', cjobName: cjobName}));
+}
+
 </g:javascript>
+
+
+
