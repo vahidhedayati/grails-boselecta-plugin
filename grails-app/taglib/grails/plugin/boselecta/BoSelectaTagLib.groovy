@@ -222,7 +222,7 @@ class BoSelectaTagLib implements ClientSessions {
 			
 			// domain3 .. domain9
 			String bindit = attrs.remove('bindid'+a)?.toString()
-			
+			println "1 ---> ${bindit}"
 			if (sId && dom) {
 				multiDomainMap+=[ "setId${a}": sId, "searchField${a}" : sf, "collectField${a}": cf,
 					 "domain${a}": dom, "bindId${a}": bindit]
@@ -237,14 +237,18 @@ class BoSelectaTagLib implements ClientSessions {
 		// needs to be appended
 		def message = [setId: "${setId}", secondary: "${domain2}", collectfield: "${collectField2}",
 			searchField:  "${searchField2}", appendValue: appendValue, appendName: appendName, job:job]
+	
+		
+		if (bindid) {
+			message.put('bindId', bindid)
+			println "2 ---> ${bindid}"
+		}
+		
 		
 		if (multiDomainMap) {
 			message += multiDomainMap
 		}
 		
-		if (bindid) {
-			message.put('bindId', bindid)
-		}
 		def cc=message as JSON
 		clientListenerService.sendJobMessage(job, cc as String)
 		
@@ -366,6 +370,28 @@ class BoSelectaTagLib implements ClientSessions {
 		gsattrs['onchange'] = "javascript:actionThis(this.value, '${setId}', '${user}', '${job}');"
 
 
+		int a=3
+		def multiDomainMap = [:]
+		while (a < 10 ) {
+			 //setId3 ..setId9
+			String sId = attrs.remove('setId'+a)?.toString()
+			// searchField3 .. searchField9
+			String sf=attrs.remove('searchField'+a)?.toString()
+			// collectField3 .. collectField9
+			String cf=attrs.remove('collectField'+a)?.toString()
+			// domain3 .. domain9
+			String dom = attrs.remove('domain'+a)?.toString()
+			
+			// domain3 .. domain9
+			String bindit = attrs.remove('bindid'+a)?.toString()
+			
+			if (sId && dom) {
+				multiDomainMap+=[ "setId${a}": sId, "searchField${a}" : sf, "collectField${a}": cf,
+					 "domain${a}": dom, "bindId${a}": bindit]
+			}
+			a++
+		}
+		
 		out << g.select(gsattrs)
 
 		// Generate Message which is initial map containing default containing result set that then
@@ -375,6 +401,11 @@ class BoSelectaTagLib implements ClientSessions {
 		if (bindid) {
 			message.put('bindId', bindid)
 		}
+		
+		if (multiDomainMap) {
+			message += multiDomainMap
+		}
+		
 		def cc=message as JSON
 		clientListenerService.sendJobMessage(job, cc as String)
 		
