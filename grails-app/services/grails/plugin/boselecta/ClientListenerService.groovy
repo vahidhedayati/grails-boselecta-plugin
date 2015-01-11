@@ -114,24 +114,20 @@ public class ClientListenerService extends ConfService implements UserSessions, 
 		userSession.basicRemote.sendText(message)
 	}
 
-
-
-	public void truncateStoredMap(String job) {
-		if (storedMap) {
-			cloneMap.clear()
-			boolean go = false
-			storedMap?.each { s ->
-				if (s && (s.jobName != job)) {
-					cloneMap.add(s)
-				}
-			}
-			storedMap.clear()
-			cloneMap.each { s ->
-				storedMap.add(s)
+/*
+	public void truncateStoredMap(Session userSession, String job) {
+		def myMaper = userSession.userProperties.get("currentMap")
+		Set<HashMap<String,String>> storedMap1= Collections.synchronizedSet(new HashSet<HashMap<String,String>>())
+		if (myMaper) {
+			myMaper.each { ss->
+				//if (ss.jobName!=job) {
+				//	storedMap1.add(ss)
+				//}
 			}
 		}
+		userSession.userProperties.put("currentMap", storedMap1)
 	}
-
+*/
 
 	Session p_connect(String _uri, String _username, String _room){
 		String oRoom = _room ?: config.room

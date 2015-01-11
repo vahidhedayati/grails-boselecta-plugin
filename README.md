@@ -3,12 +3,15 @@ Bo selecta!
 
 Grails websocket Multi select plugin, a secure way of interacting with multi domains. Messages sent from frontend socket connection to backend socket connection which produces JSON list and sends back only result set to frontend defined divId.
 
-This is a result of insecurity faced by many who used [ajaxdependancyselection plugin](https://github.com/vahidhedayati/ajaxdependancyselection). 
+This is a result of security issues faced by many who used [ajaxdependancyselection plugin](https://github.com/vahidhedayati/ajaxdependancyselection). 
 
 
  ### Video
- [Video 1 Basic tutorial](https://www.youtube.com/watch?v=wZJl-pPPlOA) 
+ [Video 1 Basic tutorial](https://www.youtube.com/watch?v=wZJl-pPPlOA)
+  
+ [Video 2 More detailed lookups, defined values, multiple dependencies](https://www.youtube.com/watch?v=qbYvy2Uc_Fc)
 
+[Video 3 no ref/loose dependencies + randomizing username](https://www.youtube.com/watch?v=7FxYJjMLSjQ)
 
  BoSelecta can be incorporated to an existing grails app running ver 2>+. Supports both resource (pre 2.4) /assets (2.4+) based grails sites.
 
@@ -51,19 +54,19 @@ boselecta.add.appName = 'yes'
 
 /*
 * Websocket hostname by default is localhost:8080
-* <boselect:connect hostname='something'.... /> 
+* <bo:connect hostname='something'.... /> 
 */
 boselecta.hostname = 'your websockethostname'
 
 /*
 * Websocket _socketConnect by default is {/plugin/views}/boselecta/_socketConnect.gsp
-*<boselect:connect socketConnectTemplate='something'.... /> 
+*<bo:connect socketConnectTemplate='something'.... /> 
 */
 boselecta.socketConnectTemplate = '/path/to/process/template'
  
  /*
  * Websocket socketProcessTemplate by default is {/plugin/views}/boselecta/_socketProcess.gsp
- *<boselect:selectPrimary socketProcessTemplate='something'.... /> 
+ *<bo:selecta socketProcessTemplate='something'.... /> 
  */
 boselecta.socketProcessTemplate = '/path/to/process/template'
 
@@ -74,125 +77,28 @@ boselecta.socketProcessTemplate = '/path/to/process/template'
 ##### grails Bo Select Plugin usage:
 After plugin installtion we have on a gsp an initial backend  connection called boselect:connect, followed by boselect:selectPrimary. initiall connnection sends a connection message - nothing useful the rest is done by taglib call below.
 
+[Example 1: Connector / selectPrimary into default g:select box. (found in above testbo project)](https://github.com/vahidhedayati/testbo/blob/master/grails-app/views/test/index.gsp)
 
-Example 1: Connector / selectPrimary into default g:select box. (found in above testbo project)
-```gsp
-<boselecta:connect
-user="randomUser"
-job="job1"
-message="Woot we are connected"
- />
+[Example 2:  Connector / primary / into Secondary into g:select:  (found in above testbo project)](https://github.com/vahidhedayati/testbo/blob/master/grails-app/views/test/index2.gsp)
 
-  
-<boselecta:selectPrimary id="MyCountry1" name="MyCountry1"
-job= "job1"
-user="randomUser"
-domain='ajaxdependancyselectexample.MyCountry'
-searchField='countryName'
-collectField='id'
-domain2='ajaxdependancyselectexample.MyCity'
-bindid="mycountry.id"
-searchField2='cityName'
-collectField2='id'
-noSelection="['': 'Please choose Country']"
-setId="MyCity1"
-value='1'
-secondaryValue='2'
-/>
+[Example 3: Defined pre selected values across multiple objects + randomized user within gsp](https://github.com/vahidhedayati/testbo/blob/master/grails-app/views/test/definedselectvalues.gsp)
+
+[Example 4: Defined pre selected values across less multiple objects + randomized user within controller](https://github.com/vahidhedayati/testbo/blob/master/grails-app/views/test/definedselectvalues2.gsp)
+
+[Example 5: Defined pre selected values same as example3 but with JSON return object](https://github.com/vahidhedayati/testbo/blob/master/grails-app/views/test/definedselectvalues3.gsp)
+
+[Example 6: Multiple relationship per domainClass example i.e. object1 has many upto 18th relations with object2 3 4..18](https://github.com/vahidhedayati/testbo/blob/master/grails-app/views/test/multidomainexample.gsp)
+
+[Example 7: applicable to all methods - reuse of the taglib multiple times on the same page](https://github.com/vahidhedayati/testbo/blob/master/grails-app/views/test/multimultidomainexample.gsp)
+
+[Example 8: No reference or loose dependency relation between a secondary called object and the next domainClass](https://github.com/vahidhedayati/testbo/blob/master/grails-app/views/test/noref.gsp)
+
+[Example 9: No reference relationshiip with secondary object that then returns back into a normal relationship object](https://github.com/vahidhedayati/testbo/blob/master/grails-app/views/test/norefselectionext.gsp)
+
+[Example 10: Primary object with a No reference relationshiip ](https://github.com/vahidhedayati/testbo/blob/master/grails-app/views/test/norefprimary.gsp)
 
 
-<g:select name="MyCity1" id="MyCity1" optionKey="id" optionValue="cityName" from="[]" required="required" noSelection="['': 'Please choose Country']" />
-<input type=submit value=go> 
-
-					
-```
-
-Example 2:  Connector / primary / into Secondary into g:select:  (found in above testbo project)
-
-```gsp
-<boselecta:connect
-user="randomUser2"
-job="job2"
-message="Woot we are connected"
- />
-
- <form method=post action=example5>
-    
-<boselecta:selectPrimary id="MyContinent2" name="MyContinent2"
-job= "job2"
-user="randomUser2"
-    domain='ajaxdependancyselectexample.MyContinent'
-    searchField='continentName'
-    collectField='id'
-    
-    domain2='ajaxdependancyselectexample.MyCountry'
-    bindid="mycontinent.id"
-    searchField2='countryName'
-    appendValue=''
-    appendName='Updated'
-    collectField2='id'
-
-    hidden="hiddenNew"
-    noSelection="['': 'Please choose Continent']" 
-    setId="MyCountry11"
-    />
-
-
-
-<boselecta:selectSecondary id="MyCountry11" name="MyCountry11"
-job= "job2"
-user="randomUser2"
-	domain2='ajaxdependancyselectexample.MyCity'
-    bindid="mycountry.id"
-    searchField2='cityName'
-    collectField2='id'
-    
-    
-     appendValue=''
-     appendName='Updated'
-    
-    
-    noSelection="['': 'Please choose Continent']" 
-    setId="MyCity11"
-    />
-
-
-
-
-
-    <boselecta:selectSecondary name="MyCity11" id="MyCity11"  
-    job= "job2"
-	user="randomUser2"
-    optionKey="id" optionValue="name"
-    
-    
-    domain2='ajaxdependancyselectexample.MyShops'
-    bindid="mycity.id"
-    searchField2='shopName'
-    collectField2='id'
-    appendValue=''
-    appendName='Updated'
-   
-    
-    setId="MyShop12"
-	noSelection="['': 'Please choose Country 1111']" 
-	/>
-
-
-
-    <g:select name="MyShop12" id="MyShop12"  
-    optionKey="id" optionValue="shopName" 
-    from="[]" required="required" noSelection="['': 'Please choose City']" 
-    />
-    
-
-    <input type=submit value=go>  
-    </form>
-
-```
-
-
-##### What the heck is frontend / backend websocket connections ?
+##### What is frontend / backend websocket connections ?
 Ok apologies since its probably my bad description of the actual process.
 
 By front end I mean a typical web page connection to a websocket session. So this is where the <boselecta:connect tag lib does two websocket tasks

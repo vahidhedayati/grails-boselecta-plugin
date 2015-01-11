@@ -28,6 +28,7 @@ class AuthService extends ConfService implements UserSessions  {
 	}
 
 
+	
 	Boolean loggedIn(String user) {
 		Boolean loggedin = false
 		try {

@@ -1,130 +1,132 @@
 
 <g:javascript>
-var loggedInUsers=[];
-var user="${user }";
-var receivers="${receivers}"
-	var arrayLength = receivers.length;
-// Connect websocket and set up processes 
+	var loggedInUsers=[];
+	var user="${user }";
+
 
 <g:if test="${addAppName=='no'}">
-var uri="ws://${hostname}/${chatApp }/${job}";
+	var uri="ws://${hostname}/${chatApp }/${job}";
 </g:if>
 <g:else>
-var uri="ws://${hostname}/${appName}/${chatApp }/${job}";
+	var uri="ws://${hostname}/${appName}/${chatApp }/${job}";
 </g:else>
 
-var webSocket=new WebSocket(uri);
-webSocket.onopen=function(message) {processOpen(message);};
-webSocket.onclose=function(message) {processClose(message);};
-webSocket.onerror=function(message) {processError(message);};
-webSocket.onmessage=function(message) {processMessage(message);	};
+	var webSocket${job}=new WebSocket(uri);
+	webSocket${job}.onopen=function(message) {processOpen(message);};
+	webSocket${job}.onclose=function(message) {processClose(message);};
+	webSocket${job}.onerror=function(message) {processError(message);};
+	webSocket${job}.onmessage=function(message) {processMessage(message);	};
 
 
-var userList=[];
+	var userList=[];
 
-function processMessage( message) {
-
-	var jsonData = JSON.parse(message.data);
-	if (jsonData.message!=null) {
-
-		var itJson=isJson(jsonData.message);
-		if (itJson==true	) {
+	function processMessage( message) {
+	
+		//console.log(JSON.stringify(message.data));
 		
-			var jsonData1 = JSON.parse(jsonData.message);
-			var setId,appendValue, appendName, updated='';
+		var jsonData = JSON.parse(message.data);
+		if (jsonData.message!=null) {
+			var itJson=isJson(jsonData.message);
+			if (itJson==true	) {
 			
-			if (jsonData1.updateThisDiv!=null) {
-				setId=jsonData1.updateThisDiv;
-			}
-			
-			if (jsonData1.appendValue!=null) {
-				appendValue=jsonData1.appendValue;
-			}
-			
-			if (jsonData1.appendName!=null) {
-				appendName=jsonData1.appendName;
-			}
-			
-			if (jsonData1.updated!=null) {
-				updated=jsonData1.updated;
-			}
-			
-			if (jsonData1.result!=null) {
-			    var jsonResult = jsonData1.result;
-			    updateView(jsonResult, setId, appendName, appendValue, updated);
-			}
-			 
-			if (jsonData1.result3!=null) {
-			    var jsonResult = jsonData1.result3;
-			    updateOtherView(jsonResult,3);
-			}
-			
-			if (jsonData1.result4!=null) {
-			    var jsonResult = jsonData1.result4;
-			    updateOtherView(jsonResult,4);
-			}
-			
-			if (jsonData1.result5!=null) {
-			    var jsonResult = jsonData1.result5;
-			    updateOtherView(jsonResult,5);
-			}
-			
-			if (jsonData1.result6!=null) {
-			    var jsonResult = jsonData1.result6;
-			    updateOtherView(jsonResult,6);
-			}
-			
-			if (jsonData1.result7!=null) {
-			    var jsonResult = jsonData1.result7;
-			    updateOtherView(jsonResult,7);
-			}
-			
-			if (jsonData1.result8!=null) {
-			    var jsonResult = jsonData1.result8;
-			    updateOtherView(jsonResult,8);
-			}
-			
-			if (jsonData1.result9!=null) {
-			    var jsonResult = jsonData1.result9;
-			    updateOtherView(jsonResult,9);
-			}
-		}	
-	}
+				var jsonData1 = JSON.parse(jsonData.message);
+				var appendValue, appendName, updated, updateValue, nextValue,formatting='';
+				
+				if (jsonData1.updateThisDiv!=null) {
+					setId=jsonData1.updateThisDiv;
+				}
+				
+				if (jsonData1.appendValue!=null) {
+					appendValue=jsonData1.appendValue;
+				}
+				
+				if (jsonData1.appendName!=null) {
+					appendName=jsonData1.appendName;
+				}
+				
+				if (jsonData1.formatting!=null) {
+					formatting=jsonData1.formatting;
+					
+				}
+				
+				
+				if (jsonData1.nextValue!=null) {
+					nextValue=jsonData1.nextValue;
+				}
+				
+				if (jsonData1.updated!=null) {
+					updated=jsonData1.updated;
+				}
+				
+				if (jsonData1.updateValue!=null) {
+					updateValue=jsonData1.updateValue;
+				}
+				
+				if (jsonData1.result!=null) {
+				    var jsonResult = jsonData1.result;
+				    updateView(jsonResult, setId, appendName, appendValue, updated, updateValue, nextValue,formatting);
+				}
+				
+				for (a=3; a < 10; a++) {
+				var c=a;
+				try {
+					var cid = eval('jsonData1.setId'+c);
+					 if (cid!=null) {
+					 	var jsonResult = eval('jsonData1.result'+c);
+					 	updateOtherView(jsonResult, cid, updateValue,formatting);
+					}
+				} catch(ex) {
+				}	
+				}
+			}	
+		}
 
 	// Log out user if system tells it to	
 	if (jsonData.system!=null) {
 		if (jsonData.system=="disconnect") { 
-			webSocket.send("DISCO:-"+user);
-			webSocket.close();
+			webSocket${job}.send("DISCO:-"+user);
+			webSocket${job}.close();
 		}
 	}
 }
 
 
-function updateOtherView(jsonResult,cid) {
-	jsonResult.forEach(function(entry1) {
-	
-		var rselect = document.getElementById(entry1.setId+cid);
-	
-		var opt = document.createElement('option');
-		if (entry1.id!=null) {
-			id=entry1.id;
-		}
-		if (entry1.name!=null) {
-			name=entry1.name;
-		}
-		opt.value=name
-		opt.text=id
-		try {
-			rselect.add(opt, null)
-		} catch(ex) {
-			rselect.add(opt)
+function updateOtherView(jsonResult,cid, updateValue,format) {
+	var id, name,resarray='';
+	jsonResult.forEach(function(entry) {
+		var rselect = document.getElementById(cid);
+		if (rselect) {
+			var opt = document.createElement('option');
+			if (entry.id!=null) {
+				id=entry.id;
+			}
+			if (entry.name!=null) {
+				name=entry.name;
+			}
+			
+			
+			if (format == "JSON") {
+				opt.value=JSON.stringify(resarray);
+			}else{
+				opt.value=name;
+			}
+			opt.text=id
+			if (id==updateValue) {
+				//opt.checked=true;
+				opt.setAttribute('selected', true);
+			}
+			try {
+				rselect.add(opt, null)
+			} catch(ex) {
+				rselect.add(opt)
+			}
+			
 		}
 	});
 }
  
-function updateView(jsonResult, setId, appendName, appendValue, updated) {
-	var id, name='';
+function updateView(jsonResult, setId, appendName, appendValue, updated, updateValue, nextValue,format) {
+	var id, name,resarray='';
 	var rselect = document.getElementById(setId);
 	var l = rselect.length;
 	while (l > 0) {
@@ -148,11 +150,21 @@ function updateView(jsonResult, setId, appendName, appendValue, updated) {
 		if (entry1.id!=null) {
 			id=entry1.id;
 		}
+		if (entry1.resarray!=null) {
+			resarray=entry1.resarray;
+		}
 		if (entry1.name!=null) {
 			name=entry1.name;
 		}
-		opt.value=name
+		if (format == "JSON") {
+				opt.value=JSON.stringify(resarray);
+			}else{
+				opt.value=name;
+			}
 		opt.text=id
+			if (name==nextValue) {
+				opt.setAttribute('selected', true);
+			}
 		try {
 			rselect.add(opt, null)
 		} catch(ex) {
@@ -196,27 +208,26 @@ function addUser(uid) {
 }
 
 function processClose(message) {
-	webSocket.send("DISCO:-"+user);
-	console.log('Closing');
-	webSocket.close();
+	webSocket${job}.send("DISCO:-"+user);
+	webSocket${job}.close();
 }
 
 
 // Open connection only if we have frontuser variable    
 function processOpen(message) {
 	<g:if test="${frontuser}">
-	webSocket.send("CONN:-${frontuser}");
+		webSocket${job}.send("CONN:-${frontuser}");
 	</g:if>
 	<g:else>
-	webSocket.send("DISCO:-");
-	webSocket.close();
+		webSocket${job}.send("DISCO:-");
+		webSocket${job}.close();
 	</g:else>
 }
 
 
 
 window.onbeforeunload = function() {
-	webSocket.onclose = function() { }
-	webSocket.close();
+	webSocket${job}.onclose = function() { }
+	webSocket${job}.close();
 }
 </g:javascript>

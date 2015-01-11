@@ -1,9 +1,5 @@
 package grails.plugin.boselecta
 
-import java.text.SimpleDateFormat
-import java.util.Map;
-
-import javax.websocket.Session
 
 
 class ConfService {
@@ -16,6 +12,17 @@ class ConfService {
 		return Boolean.valueOf(input ?: false)
 	}
 
+	Integer getDepth() {
+		
+		int result = (config.depth ?: '10') as int 
+		if (result > 18) {
+			result= 18
+		} 
+		return result
+		
+		//return (config.depth ?: '10') as int
+	} 
+	
 	String getFrontend() {
 		return config.frontenduser ?: '_frontend'
 	}
@@ -29,6 +36,7 @@ class ConfService {
 		}
 	}
 
+	
 	public Map<String, String> parseInput(String mtype,String message){
 		def p1 = mtype
 		def mu = message.substring(p1.length(),message.length())

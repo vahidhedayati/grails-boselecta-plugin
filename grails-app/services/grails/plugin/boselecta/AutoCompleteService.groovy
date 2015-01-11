@@ -1,5 +1,7 @@
 package grails.plugin.boselecta
 
+import grails.converters.JSON
+
 
 
 class AutoCompleteService {
@@ -14,6 +16,31 @@ class AutoCompleteService {
 		return results
 	}
 
+	// No reference selection method i.e. belongsTo=UpperClass
+	ArrayList selectNoRefDomainClass(String domainClaz, String domainClaz2, String searchField, String collectField, String bindName, String recordId) {
+		//println "--- > noRef : ${domainClaz } ${domainClaz2} $searchField $collectField $bindName $recordId"
+		
+		def primarySelectList = []
+		if ((domainClaz2) && (domainClaz) &&( recordId)) {
+			def domainClass2 = grailsApplication?.getDomainClass(domainClaz2)?.clazz
+			def domainClass = grailsApplication?.getDomainClass(domainClaz)?.clazz
+			domainClass2.withTransaction {
+				def domaininq=domainClass?.get(recordId.toLong())
+				if (domaininq) {
+					domaininq."${bindName}".each { dq ->
+						//println "->>>>>>>  ---------------"+dq."${searchField}"
+						//println "------------"+dq."${collectField}"
+						def primaryMap = [:]
+						primaryMap.put('id',dq."${collectField}")
+						primaryMap.put('name', dq."${searchField}")
+						primaryMap.put('resarray', [selectedText: dq."${searchField}", selected:dq."${collectField}"])
+						primarySelectList.add(primaryMap)
+					}
+				}
+			}
+		}
+		return primarySelectList
+	}
 
 	ArrayList selectDomainClass(String domainClaz, String searchField, String collectField, String bindName, String recordId) {
 		def primarySelectList=[]
@@ -28,15 +55,11 @@ class AutoCompleteService {
 				order(searchField)
 			}
 			if (query) {
-
 				primarySelectList=resultSet2(query as List)
 			}
 		}
 		return primarySelectList
 	}
-
-
-
 
 	def resultSet1(def results) {
 		def primarySelectList=[]
@@ -58,6 +81,7 @@ class AutoCompleteService {
 				def primaryMap = [:]
 				primaryMap.put('id', it[0])
 				primaryMap.put('name', it[1])
+				primaryMap.put('resarray', [selectedText: it[0], selected:it[1]])
 				primarySelectList.add(primaryMap)
 			}
 		}

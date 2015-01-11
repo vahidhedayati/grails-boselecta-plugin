@@ -13,6 +13,23 @@ public class ClientProcessService extends ConfService implements ClientSessions 
 	def clientListenerService
 	def autoCompleteService
 
+	private String 	domain3, collectfield3, searchField3, setId3, bindId3,
+	domain4, collectfield4, searchField4, setId4, bindId4,
+	domain5, collectfield5, searchField5, setId5, bindId5,
+	domain6, collectfield6, searchField6, setId6, bindId6,
+	domain7, collectfield7, searchField7, setId7, bindId7,
+	domain8, collectfield8, searchField8, setId8, bindId8,
+	domain9, collectfield9, searchField9, setId9, bindId9,
+	domain10, collectfield10, searchField10, setId10, bindId10,
+	domain11, collectfield11, searchField11, setId11, bindId11,
+	domain12, collectfield12, searchField12, setId12, bindId12,
+	domain13, collectfield13, searchField13, setId13, bindId13,
+	domain14, collectfield14, searchField14, setId14, bindId14,
+	domain15, collectfield15, searchField15, setId15, bindId15,
+	domain16, collectfield16, searchField16, setId16, bindId16,
+	domain17, collectfield17, searchField17, setId17, bindId17,
+	domain18, collectfield18, searchField18, setId18, bindId18
+
 
 	public void processResponse(Session userSession, String message) {
 		String username = userSession.userProperties.get("username") as String
@@ -78,89 +95,66 @@ public class ClientProcessService extends ConfService implements ClientSessions 
 	}
 
 	def checkMessage(Session userSession, String username, JSONObject rmesg) {
-println "----------------> ${rmesg}"
-		// Initial connection 
+		// Initial connection
 		String secondary = rmesg.secondary
+		String primary = rmesg.primary
 		String collectfield = rmesg.collectfield
 		String searchField = rmesg.searchField
 		String  setId = rmesg.setId
-		
+		String formatting = rmesg.formatting
 		String bindId = rmesg.bindId
-		String appendValue = rmesg.appendValue
-		String appendName = rmesg.appendName
+		String appendValue = rmesg.appendValue ?: ''
+		String appendName = rmesg.appendName ?: ''
 		String jobName = rmesg.job
 
-		String domain3 = rmesg.domain3
-		String collectfield3 = rmesg.collectfield3
-		String searchField3 = rmesg.searchField3
-		String  setId3 = rmesg.setId3
-		String bindId3 = rmesg.bindId3
-		
-		String domain4 = rmesg.domain4
-		String collectfield4 = rmesg.collectfield4
-		String searchField4 = rmesg.searchField4
-		String  setId4 = rmesg.setId4
-		String bindId4 = rmesg.bindId4
-		
-		String domain5 = rmesg.domain5
-		String collectfield5 = rmesg.collectfield5
-		String searchField5 = rmesg.searchField5
-		String  setId5 = rmesg.setId5
-		String bindId5 = rmesg.bindId5
-		
-		String domain6 = rmesg.domain6
-		String collectfield6 = rmesg.collectfield6
-		String searchField6 = rmesg.searchField6
-		String  setId6 = rmesg.setId6
-		String bindId6 = rmesg.bindId6
-		
-		String domain7 = rmesg.domain7
-		String collectfield7 = rmesg.collectfield7
-		String searchField7 = rmesg.searchField7
-		String  setId7 = rmesg.setId7
-		String bindId7 = rmesg.bindId7
-		
-		String domain8 = rmesg.domain8
-		String collectfield8 = rmesg.collectfield8
-		String searchField8 = rmesg.searchField8
-		String  setId8 = rmesg.setId8
-		String bindId8 = rmesg.bindId8
-		
-		String domain9 = rmesg.domain9
-		String collectfield9 = rmesg.collectfield9
-		String searchField9 = rmesg.searchField9
-		String  setId9 = rmesg.setId9
-		String bindId9 = rmesg.bindId9
-		
-		
+
+
 		//Return via Javascript upon click
 		String cjobName = rmesg.cjobName
 		String updateValue = rmesg.updateValue
 		String updateDiv = rmesg.updateDiv
 		String updated = rmesg.updated ?: 'yes'
+		String nextValue = rmesg.nextValue ?: ''
 
 		if (setId) {
-			
+			for (int a=3; a < depth; a++ ) {
+				this."domain${a}" = rmesg."domain${a}"
+				this."collectfield${a}" = rmesg."collectfield${a}"
+				this."searchField${a}" = rmesg."searchField${a}"
+				this."bindId${a}"= rmesg."bindId${a}"
+				this."setId${a}"= rmesg."setId${a}"
+			}
+			Set<HashMap<String,String>> storedMap1= Collections.synchronizedSet(new HashSet<HashMap<String,String>>())
+
 			def myMap = [
-				jobName: jobName, setId: setId,  secondary: secondary,collectfield:collectfield, 
-				searchField:searchField, bindId:bindId, appendValue:appendValue, appendName:appendName,
-				setId3: setId3, domain3: domain3, searchField3:searchField3, collectfield3:collectfield3, bindId3: bindId3,
-				setId4: setId4, domain4: domain4, searchField4:searchField4, collectfield4:collectfield4, bindId4: bindId4,
-				setId5: setId5, domain5: domain5, searchField5:searchField5, collectfield5:collectfield5, bindId5: bindId5,
-				setId6: setId6, domain6: domain6, searchField6:searchField6, collectfield6:collectfield6, bindId6: bindId6,
-				setId7: setId7, domain7: domain7, searchField7:searchField7, collectfield7:collectfield7, bindId7: bindId7,
-				setId8: setId8, domain8: domain8, searchField8:searchField8, collectfield8:collectfield8, bindId8: bindId8,
-				setId9: setId9, domain9: domain9, searchField9:searchField9, collectfield9:collectfield9, bindId9: bindId9
+				jobName: jobName, setId: setId,  secondary: secondary,collectfield:collectfield,
+				searchField:searchField, bindId:bindId, appendValue:appendValue, primary:primary,
+				appendName:appendName, nextValue:nextValue, formatting:formatting
 			]
 
-			storedMap.add(myMap)
 
+			for (int a=3; a < depth; a++ ) {
+				myMap += [("setId${a}"): this."setId${a}", ("domain${a}"): this."domain${a}",
+					("searchField${a}"): this."searchField${a}", ("collectfield${a}"): this."collectfield${a}",
+					("bindId${a}"): this."bindId${a}"]
+			}
+
+			def myMaper = userSession.userProperties.get("currentMap")
+			storedMap1.add(myMap)
+			if (myMaper) {
+				myMaper.each { ss->
+					storedMap1.add(ss)
+				}
+			}
+			
+			userSession.userProperties.put("currentMap", storedMap1)
+			
 		}else if (updateValue) {
+			def myMaper = userSession.userProperties.get("currentMap")
 			Map currentSelection = [:]
-			if (storedMap) {
+			if (myMaper) {
 				boolean go = false
-
-				storedMap.each { s ->
+				myMaper.each { s ->
 					go = false
 					if (s.setId == updateDiv) {
 						go = true
@@ -168,87 +162,55 @@ println "----------------> ${rmesg}"
 						collectfield = s.collectfield
 						searchField = s.searchField
 						bindId = s.bindId
-						
-						domain3 = s.domain3
-						collectfield3 = s.collectfield3
-						searchField3 = s.searchField3
-						bindId3 = s.bindId3
-						setId3 = s.setId3
-						
-						domain4 = s.domain4
-						collectfield4 = s.collectfield4
-						searchField4 = s.searchField4
-						bindId4 = s.bindId4
-						setId4 = s.setId4
-						
-						domain5 = s.domain5
-						collectfield5 = s.collectfield5
-						searchField5 = s.searchField5
-						bindId5 = s.bindId5
-						setId5 = s.setId5
-						
-						domain6 = s.domain6
-						collectfield6 = s.collectfield6
-						searchField6 = s.searchField6
-						bindId6 = s.bindId6
-						setId6 = s.setId6
-						
-						domain7 = s.domain7
-						collectfield7 = s.collectfield7
-						searchField7 = s.searchField7
-						bindId7 = s.bindId7
-						setId7 = s.setId7
-						
-						domain8 = s.domain8
-						collectfield8 = s.collectfield8
-						searchField8 = s.searchField8
-						bindId8 = s.bindId8
-						setId8 = s.setId8
-						
-						domain9 = s.domain9
-						collectfield9 = s.collectfield9
-						searchField9 = s.searchField9
-						bindId9 = s.bindId9
-						setId9 = s.setId9
-						
 						appendValue = s.appendValue
 						appendName = s.appendName
+						formatting = s.formatting
+						nextValue = s.nextValue
+						primary = s.primary
 					}
 					if (go) {
-						ArrayList result = autoCompleteService.selectDomainClass(secondary, collectfield, searchField, bindId, updateValue )
-						
-						ArrayList result3, result4, result5, result6, result7, result8, result9=[]
-						
-						if (domain3 && domain3=="null") {
-							result3 = autoCompleteService.selectDomainClass(domain3, collectfield3, searchField3, bindId3, setId3 )
-						}
-						if (domain4  && domain4=="null") {
-							result4 = autoCompleteService.selectDomainClass(domain4, collectfield4, searchField4, bindId4, setId4 )
-						}
-						if (domain5  && domain5=="null") {
-							result5 = autoCompleteService.selectDomainClass(domain5, collectfield5, searchField5, bindId5, setId5 )
-						}
-						if (domain6  && domain6=="null") {
-							result6 = autoCompleteService.selectDomainClass(domain6, collectfield6, searchField6, bindId6, setId6 )
-						}
-						if (domain7  && domain7=="null") {
-							result7 = autoCompleteService.selectDomainClass(domain7, collectfield7, searchField7, bindId7, setId7 )
-						}
-						if (domain8  && domain8=="null") {
-							result8 = autoCompleteService.selectDomainClass(domain8, collectfield8, searchField8, bindId8, setId8 )
-						}
-						if (domain9  && domain9=="null") {
-							result9 = autoCompleteService.selectDomainClass(domain9, collectfield9, searchField9, bindId9, setId9 )
-						}
-						
-						
-						JSON mresult = ([ result: result, result3: result3, result4: result4, result5: result5, result6: result6, result7: result7, result8: result8, 
-							result9: result9, updateThisDiv: updateDiv, appendName: appendName, appendName: appendName, updated:updated ]) as JSON
-						clientListenerService.sendFrontEndPM(userSession, username,mresult as String)
 
+						ArrayList result
+						if (bindId.endsWith('.id')) {
+						 result = autoCompleteService.selectDomainClass(secondary, collectfield, searchField, bindId, updateValue )
+						}else{
+						result = autoCompleteService.selectNoRefDomainClass(primary, secondary, collectfield, searchField, bindId, updateValue )
+						}
+						Map mresult = [ result: result,updateThisDiv: updateDiv, appendName: appendName, appendName: appendName,
+							nextValue:nextValue,updated:updated, updateValue:updateValue, formatting:formatting]
+
+						for (int a=3; a < depth; a++ ) {
+							this."domain${a}" = mapValue( s, "domain${a}")
+							this."collectfield${a}" =  mapValue( s, "collectfield${a}")
+							this."searchField${a}" = mapValue( s, "searchField${a}")
+							this."bindId${a}"= mapValue( s, "bindId${a}")
+							this."setId${a}"= mapValue( s, "setId${a}")
+							if (this."domain${a}") {
+								def res
+								if (this."bindId${a}".endsWith('.id')) {
+									res = autoCompleteService.selectDomainClass(this."domain${a}", this."collectfield${a}",
+										this."searchField${a}", this."bindId${a}", updateValue )
+								}else{
+									res = autoCompleteService.selectNoRefDomainClass(primary, this."domain${a}", this."collectfield${a}",
+										this."searchField${a}", this."bindId${a}", updateValue  )
+								}
+								if (res) {
+									mresult.put("result${a}", res)
+									mresult.put("setId${a}", this."setId${a}")
+								}
+							}
+						}
+						clientListenerService.sendFrontEndPM(userSession, username,(mresult as JSON).toString())
 					}
 				}
 			}
+		}
+	}
+
+	private String mapValue(Map s, String search) {
+		def se= s.find{ it.key  == search}
+		if (se) {
+			return se.value as String
 		}
 	}
 }

@@ -33,6 +33,7 @@ class BoSelectaEndpoint  implements ServletContextListener, UserSessions {
 	private ConfigObject config
 	private AuthService authService
 	private MessagingService messagingService
+	
 	@Override
 	public void contextInitialized(ServletContextEvent event) {
 		ServletContext servletContext = event.servletContext
@@ -70,6 +71,9 @@ class BoSelectaEndpoint  implements ServletContextListener, UserSessions {
 		config = grailsApplication.config.boselecta
 		authService = ctx.authService
 		messagingService = ctx.messagingService
+
+		
+		
 	}
 
 
@@ -110,18 +114,22 @@ class BoSelectaEndpoint  implements ServletContextListener, UserSessions {
 		}else{
 			if (message.startsWith("DISCO:-")) {
 				jobUsers.remove(userSession)
+				userSession.close()
+				Session usersSess = findSession(username+frontend)
+				if (usersSess) {
+					jobUsers.remove(usersSess)
+					usersSess.close()
+				}
 			}else if (message.startsWith("/pm")) {
 				def values = parseInput("/pm ",message)
 				String user = values.user as String
 				def msg = values.msg
 
 				if (!user.equals(username)) {
-
 					messagingService.privateMessage(userSession, user,msg)
 				}else{
 					myMsg.put("message","Private message self?")
 					messagingService.messageUser(userSession,myMsg)
-
 				}
 			}else{
 
@@ -150,7 +158,27 @@ class BoSelectaEndpoint  implements ServletContextListener, UserSessions {
 		return values
 	}
 
-
-
+	private String getFrontend() {
+		return config.frontenduser ?: '_frontend'
+	}
+	
+	private Session findSession(String username) {
+		Session userSession
+		try {
+			synchronized (jobUsers) {
+				jobUsers?.each { crec->
+					if (crec && crec.isOpen()) {
+						def cuser = crec.userProperties.get("username").toString()
+						if (cuser.equals(username)) {
+							userSession=crec
+						}
+					}
+				}
+			}
+		} catch (IOException e) {
+			log.error ("onMessage failed", e)
+		}
+		return userSession
+	}
 
 }
