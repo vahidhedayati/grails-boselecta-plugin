@@ -12,25 +12,7 @@ public class ClientProcessService extends ConfService implements ClientSessions 
 
 	def clientListenerService
 	def autoCompleteService
-
-	private String 	domain3, collectfield3, searchField3, setId3, bindId3,
-	domain4, collectfield4, searchField4, setId4, bindId4,
-	domain5, collectfield5, searchField5, setId5, bindId5,
-	domain6, collectfield6, searchField6, setId6, bindId6,
-	domain7, collectfield7, searchField7, setId7, bindId7,
-	domain8, collectfield8, searchField8, setId8, bindId8,
-	domain9, collectfield9, searchField9, setId9, bindId9,
-	domain10, collectfield10, searchField10, setId10, bindId10,
-	domain11, collectfield11, searchField11, setId11, bindId11,
-	domain12, collectfield12, searchField12, setId12, bindId12,
-	domain13, collectfield13, searchField13, setId13, bindId13,
-	domain14, collectfield14, searchField14, setId14, bindId14,
-	domain15, collectfield15, searchField15, setId15, bindId15,
-	domain16, collectfield16, searchField16, setId16, bindId16,
-	domain17, collectfield17, searchField17, setId17, bindId17,
-	domain18, collectfield18, searchField18, setId18, bindId18
-
-
+	
 	public void processResponse(Session userSession, String message) {
 		String username = userSession.userProperties.get("username") as String
 		boolean disco = true
@@ -107,6 +89,10 @@ public class ClientProcessService extends ConfService implements ClientSessions 
 		String appendName = rmesg.appendName ?: ''
 		String jobName = rmesg.job
 
+		// Related to auto complete - initial map
+		String order = rmesg.order ?: 'DESC'
+		String max = rmesg.max ?: '10'
+
 
 
 		//Return via Javascript upon click
@@ -116,27 +102,34 @@ public class ClientProcessService extends ConfService implements ClientSessions 
 		String updated = rmesg.updated ?: 'yes'
 		String nextValue = rmesg.nextValue ?: ''
 
+
+		// Related to Auto complete:
+		String updateList = rmesg.updateList
+		String updateAutoValue = rmesg.updateAutoValue  // params.term
+		String cId = rmesg.cId
+
+		String sDataList = rmesg.sDataList
+		String dataList = rmesg.dataList
+		
+		boolean autoCompletePrimary = rmesg?.autoCompletePrimary?.toBoolean() ?: false
+
+
+		//println "${autoCompletePrimary} ${cId} ${setId}"
+
 		if (setId) {
-			for (int a=3; a < depth; a++ ) {
-				this."domain${a}" = rmesg."domain${a}"
-				this."collectfield${a}" = rmesg."collectfield${a}"
-				this."searchField${a}" = rmesg."searchField${a}"
-				this."bindId${a}"= rmesg."bindId${a}"
-				this."setId${a}"= rmesg."setId${a}"
-			}
 			Set<HashMap<String,String>> storedMap1= Collections.synchronizedSet(new HashSet<HashMap<String,String>>())
 
 			def myMap = [
 				jobName: jobName, setId: setId,  secondary: secondary,collectfield:collectfield,
 				searchField:searchField, bindId:bindId, appendValue:appendValue, primary:primary,
-				appendName:appendName, nextValue:nextValue, formatting:formatting
-			]
+				appendName:appendName, nextValue:nextValue, formatting:formatting, order: order, max:max, 
+				dataList:dataList, sDataList:sDataList		]
 
 
 			for (int a=3; a < depth; a++ ) {
-				myMap += [("setId${a}"): this."setId${a}", ("domain${a}"): this."domain${a}",
-					("searchField${a}"): this."searchField${a}", ("collectfield${a}"): this."collectfield${a}",
-					("bindId${a}"): this."bindId${a}"]
+				myMap += [("setId${a}"): rmesg."setId${a}", ("domain${a}"): rmesg."domain${a}",
+					("searchField${a}"): rmesg."searchField${a}", ("collectfield${a}"): rmesg."collectfield${a}",
+					("bindId${a}"): rmesg."bindId${a}"]
 			}
 
 			def myMaper = userSession.userProperties.get("currentMap")
@@ -146,9 +139,17 @@ public class ClientProcessService extends ConfService implements ClientSessions 
 					storedMap1.add(ss)
 				}
 			}
-			
+
 			userSession.userProperties.put("currentMap", storedMap1)
-			
+				
+			if (autoCompletePrimary) {
+				def result = autoCompleteService.returnAutoList(primary, searchField, collectfield)
+				Map mresult = [ autoResult: result,updateThisDiv: cId, appendName: appendName, appendName: appendName,
+					nextValue:nextValue,updated:updated, updateValue:updateValue, formatting:formatting, cId:cId, 
+					updateList:dataList, updateAutoValue:updateAutoValue]
+				sleep(2000)
+				clientListenerService.sendFrontEndPM(userSession, username,(mresult as JSON).toString())
+			}
 		}else if (updateValue) {
 			def myMaper = userSession.userProperties.get("currentMap")
 			Map currentSelection = [:]
@@ -167,36 +168,34 @@ public class ClientProcessService extends ConfService implements ClientSessions 
 						formatting = s.formatting
 						nextValue = s.nextValue
 						primary = s.primary
+						dataList = s.dataList
+						sDataList = s.DataList
+						
 					}
 					if (go) {
 
 						ArrayList result
 						if (bindId.endsWith('.id')) {
-						 result = autoCompleteService.selectDomainClass(secondary, collectfield, searchField, bindId, updateValue )
+							result = autoCompleteService.selectDomainClass(secondary, collectfield, searchField, bindId, updateValue )
 						}else{
-						result = autoCompleteService.selectNoRefDomainClass(primary, secondary, collectfield, searchField, bindId, updateValue )
+							result = autoCompleteService.selectNoRefDomainClass(primary, secondary, collectfield, searchField, bindId, updateValue )
 						}
 						Map mresult = [ result: result,updateThisDiv: updateDiv, appendName: appendName, appendName: appendName,
-							nextValue:nextValue,updated:updated, updateValue:updateValue, formatting:formatting]
+							nextValue:nextValue,updated:updated, updateValue:updateValue, formatting:formatting, cId:cId]
 
 						for (int a=3; a < depth; a++ ) {
-							this."domain${a}" = mapValue( s, "domain${a}")
-							this."collectfield${a}" =  mapValue( s, "collectfield${a}")
-							this."searchField${a}" = mapValue( s, "searchField${a}")
-							this."bindId${a}"= mapValue( s, "bindId${a}")
-							this."setId${a}"= mapValue( s, "setId${a}")
-							if (this."domain${a}") {
+							if (mapValue( s, "domain${a}")) {
 								def res
-								if (this."bindId${a}".endsWith('.id')) {
-									res = autoCompleteService.selectDomainClass(this."domain${a}", this."collectfield${a}",
-										this."searchField${a}", this."bindId${a}", updateValue )
+								if (mapValue( s, "bindId${a}").endsWith('.id')) {
+									res = autoCompleteService.selectDomainClass(mapValue( s, "domain${a}"), mapValue( s, "collectfield${a}"),
+											mapValue( s, "searchField${a}"), mapValue( s, "bindId${a}"), updateValue )
 								}else{
-									res = autoCompleteService.selectNoRefDomainClass(primary, this."domain${a}", this."collectfield${a}",
-										this."searchField${a}", this."bindId${a}", updateValue  )
+									res = autoCompleteService.selectNoRefDomainClass(primary,  mapValue( s, "domain${a}"), mapValue( s, "collectfield${a}"),
+											mapValue( s, "searchField${a}"), mapValue( s, "bindId${a}"), updateValue  )
 								}
 								if (res) {
 									mresult.put("result${a}", res)
-									mresult.put("setId${a}", this."setId${a}")
+									mresult.put("setId${a}", mapValue( s, "setId${a}"))
 								}
 							}
 						}
@@ -204,6 +203,44 @@ public class ClientProcessService extends ConfService implements ClientSessions 
 					}
 				}
 			}
+			// Auto complete segment
+		}else if (updateAutoValue) {
+			def myMaper = userSession.userProperties.get("currentMap")
+			Map currentSelection = [:]
+			if (myMaper) {
+				boolean go = false
+				myMaper.each { s ->
+					go = false
+					//println "--${s} \n\n->${setId}\n\n--> ${updateDiv}"
+					if (s.setId == updateDiv) {
+						go = true
+						secondary = s.secondary
+						collectfield = s.collectfield
+						searchField = s.searchField
+						bindId = s.bindId
+						appendValue = s.appendValue
+						appendName = s.appendName
+						formatting = s.formatting
+						nextValue = s.nextValue
+						primary = s.primary
+						//term = s.term
+						order = s.order
+						max = s.max
+						cId = s.cId
+						
+					}
+					if (go) {
+						def res = autoCompleteService.autocompletePrimaryAction (primary, searchField, collectfield, order, max, updateAutoValue)
+						Map mresult = [ autoResult: res,updateThisDiv: updateDiv, cId: cId,  appendName: appendName, appendName: appendName,
+							nextValue:nextValue,updated:updated, updateValue:updateValue, formatting:formatting, updateList:updateList]
+						println "---_____________________________> ${res}"
+						println "${mresult}"
+						clientListenerService.sendFrontEndPM(userSession, username,(mresult as JSON).toString())
+
+					}
+				}
+			}
+
 		}
 	}
 

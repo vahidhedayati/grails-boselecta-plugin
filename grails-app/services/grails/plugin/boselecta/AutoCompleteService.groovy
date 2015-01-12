@@ -16,10 +16,47 @@ class AutoCompleteService {
 		return results
 	}
 
+	def autocompletePrimaryAction (String domain, String searchField, String collectField, String order,
+			String max, String term) {
+		def primarySelectList=[]
+	
+		println "autocompletePrimaryAction: ${domain} ${searchField} ${collectField} ${order} ${max} ${term}"
+		def domainClass = grailsApplication.getDomainClass(domain).clazz
+		domainClass.withTransaction {
+			def query = domainClass.withCriteria {
+				or{
+					ilike searchField, term + '%'
+				}
+				projections {
+					property(collectField)
+					property(searchField)
+				}
+				maxResults(Integer.parseInt(max,10))
+				//order(searchField,order)
+			}
+			if (query.size() < 5 ) {
+				query = domainClass.withCriteria {
+					or{
+						ilike searchField, "%${term}%"
+					}
+					projections {
+						property(collectField)
+						property(searchField)
+					}
+					maxResults(Integer.parseInt(max,10))
+					//order(searchField, order)
+				}
+			}
+			if (query) {
+				primarySelectList=resultSet1(query as List)
+			}
+		}
+		return primarySelectList
+	}
+
+
 	// No reference selection method i.e. belongsTo=UpperClass
 	ArrayList selectNoRefDomainClass(String domainClaz, String domainClaz2, String searchField, String collectField, String bindName, String recordId) {
-		//println "--- > noRef : ${domainClaz } ${domainClaz2} $searchField $collectField $bindName $recordId"
-		
 		def primarySelectList = []
 		if ((domainClaz2) && (domainClaz) &&( recordId)) {
 			def domainClass2 = grailsApplication?.getDomainClass(domainClaz2)?.clazz
@@ -28,8 +65,6 @@ class AutoCompleteService {
 				def domaininq=domainClass?.get(recordId.toLong())
 				if (domaininq) {
 					domaininq."${bindName}".each { dq ->
-						//println "->>>>>>>  ---------------"+dq."${searchField}"
-						//println "------------"+dq."${collectField}"
 						def primaryMap = [:]
 						primaryMap.put('id',dq."${collectField}")
 						primaryMap.put('name', dq."${searchField}")
@@ -68,6 +103,7 @@ class AutoCompleteService {
 				def primaryMap = [:]
 				primaryMap.put('id', it[0])
 				primaryMap.put('label', it[1])
+				primaryMap.put('resarray', [selectedText: it[0], selected:it[1]])
 				primarySelectList.add(primaryMap)
 			}
 		}
@@ -95,6 +131,24 @@ class AutoCompleteService {
 		}
 	}
 
+	def returnAutoList(String className, String searchField, String collectField) {
+		println "--- ${className} ${searchField} ${collectField}"
+		def results
+		if (!className.equals('')) {
+			Class clazz = grailsApplication?.getDomainClass(className)?.clazz
+			clazz.withTransaction { 
+				def res = clazz.findAll()
+				res.each { 
+					println "$it ---> -->"
+				}
+				results = res?.collect {[	'id': it."${searchField}", 'label': it."${collectField}" ]}?.unique()
+			}
+			return results
+			
+			//clazz?.list()
+		}
+	}
+	
 	def parseFilter(def filter,def filterType) {
 		def myfilter='%'+filter+'%'
 		if (filterType.equals('S')) {

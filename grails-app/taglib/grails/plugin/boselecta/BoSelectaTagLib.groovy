@@ -111,7 +111,6 @@ class BoSelectaTagLib extends ConfService implements ClientSessions {
 		userTemplate = attrs.socketProcessTemplate ?: config.socketProcessTemplate ?: ''
 		defaultTemplate = "/${VIEW}/socketProcess"
 
-
 		if (userTemplate) {
 			out << g.render(template:userTemplate, model: [job: job])
 		}else{
@@ -139,8 +138,15 @@ class BoSelectaTagLib extends ConfService implements ClientSessions {
 		String appendName = attrs.remove('appendName')?.toString()
 		String value = attrs.remove('value')?.toString()
 		String nextValue = attrs.remove('nextValue')?.toString()
-		boolean norefPrimary = attrs.remove('norefPrimary')?.toBoolean() ?: false
+		String placeHolder = attrs.remove('placeHolder')?.toString()
 		
+		String max = attrs.remove('max')?.toString()
+		String order = attrs.remove('order')?.toString()
+		
+		
+		boolean norefPrimary = attrs.remove('norefPrimary')?.toBoolean() ?: false
+		boolean autoComplete = attrs.remove('autoComplete')?.toBoolean() ?: false
+		boolean autoCompletePrimary = attrs.remove('autoCompletePrimary')?.toBoolean() ?: false
 		
 		// Format can be set as JSON
 		String formatting = attrs.remove('formatting').toString() ?: config.formatting ?: 'none'
@@ -152,21 +158,24 @@ class BoSelectaTagLib extends ConfService implements ClientSessions {
 		}
 
 
-		if (!domain2) {
-			throwTagError("Tag [multiSelect] is missing required attribute [domain2]")
-		}
+		//if (!domain2) {
+		//	throwTagError("Tag [multiSelect] is missing required attribute [domain2]")
+		//}
 
-		if (!bindid) {
-			throwTagError("Tag [multiSelect] is missing required attribute [bindid]")
-		}
+		//if (!bindid) {
+		//	throwTagError("Tag [multiSelect] is missing required attribute [bindid]")
+		//}
 
+		searchField2 = searchField2 ?: searchField
 		if (!searchField2) {
 			throwTagError("Tag [multiSelect] is missing required attribute [searchField]")
 		}
-
+		
+		collectField2 = collectField2 ?: collectField
 		if (!collectField2) {
 			collectField2 = searchField2
 		}
+		
 		if (!collectField) {
 			collectField=collectField2
 		}
@@ -197,37 +206,51 @@ class BoSelectaTagLib extends ConfService implements ClientSessions {
 		}
 		List primarylist = []
 
-		if ((domain) && ((bindid.endsWith('.id'))||(norefPrimary))) {
+		if ((domain) && (bindid && (bindid.endsWith('.id'))||(norefPrimary))) {
 			primarylist = autoCompleteService.returnPrimaryList(domain)
 		}
-
-		def gsattrs=['optionKey' : "${collectField}" , 'optionValue': "${searchField}",
-			'id': "${id}", 'value': "${value}", 'name': "${name}"]
-
-
-		gsattrs['noSelection'] = attrs.noSelection
-		gsattrs['from'] = primarylist
-
-		if (requireField) {
-			gsattrs['required'] = 'required'
+		
+		def multiDomainMap
+		
+		String dataList = "${id}-datalist"
+		String sDataList = "${setId}-datalist"
+		
+		// AutoComplete box
+		if (autoComplete) {
+			genAutoComp(attrs.genAutoComplete, id,  placeHolder,  setId, collectField, searchField, user, 
+				job, value, name, dataList, sDataList, autoCompletePrimary)
 		}
+		// Select Box
+		else{
+			
+			def gsattrs=['optionKey' : "${collectField}" , 'optionValue': "${searchField}",
+				'id': "${id}", 'value': "${value}", 'name': "${name}"]
 
-		// Front End JAVA Script actioned by socketProcess gsp template
-		gsattrs['onchange'] = "javascript:actionThis(this.value, '${setId}', '${user}', '${job}');"
+			gsattrs['noSelection'] = attrs.noSelection
+			gsattrs['from'] = primarylist
 
-		// Parse taglib call for domain3..domainX and its setId's searchField
-		//  and collectFields.....
-		// extend from 3..9 by setting Config.groovy boselecta.depth="18"
-		// Add to a map called multiDomainMap
-		def multiDomainMap = createDomainMap(attrs)
+			if (requireField) {
+				gsattrs['required'] = 'required'
+			}
 
-		out << g.select(gsattrs)
+			// 	Front End JAVA Script actioned by socketProcess gsp template
+			gsattrs['onchange'] = "javascript:actionThis(this.value, '${setId}', '${user}', '${job}');"
+
+			// Parse taglib call for domain3..domainX and its setId's searchField and collectFields.....
+			// Add to a map called multiDomainMap
+			multiDomainMap = createDomainMap(attrs)
+
+			out << g.select(gsattrs)
+		}
+		
 
 		// Generate Message which is initial map containing default containing 
 		// result set that then needs to be appended
 		def message = [setId: "${setId}", secondary: "${domain2}", collectfield: "${collectField2}",
 			searchField:  "${searchField2}", appendValue: appendValue, appendName: appendName, job:job, 
-			formatting:formatting, nextValue:nextValue, primary: "${domain}"]
+			formatting:formatting, nextValue:nextValue, primary: "${domain}", max:max, order:order, cId: id,
+			autoCompletePrimary:autoCompletePrimary, dataList:dataList, sDataList:sDataList
+			]
 
 		if (bindid) {
 			message.put('bindId', bindid)
@@ -243,7 +266,35 @@ class BoSelectaTagLib extends ConfService implements ClientSessions {
 			genDefinedValueScript(attrs.actionNonAppendThis,value,  setId, user, job)
 		}
 	}
+	
+	private void genAutoComp(String genAutoComplete, String id, String placeHolder, String setId, 
+		String collectField, String searchField, String user, String job, String value,
+		 String name, String dataList, String sDataList, boolean autoCompletePrimary) {
+		 
+		//if (value) {
+			//println "--- genAutoComplete"
+			// Moved to gsp template - so that you can override
+			def userTemplate = genAutoComplete ?: config.genAutoComplete
+			def defaultTemplate
+			//if (autoCompletePrimary) {
+			//	defaultTemplate = "/${VIEW}/genAutoCompletePrimary"
+			//}else{
+				defaultTemplate = "/${VIEW}/genAutoComplete"
+			//}
 
+			Map map = [value: value, setId:setId, user:user, job:job, name:name, dataList:dataList, 
+				searchField:searchField, collectField: collectField, id:id, placeHolder:placeHolder, 
+				sDataList:sDataList]
+			println "TAGLIB MAP : ${map}"
+			if (userTemplate) {
+				out << g.render(template:userTemplate, model: map)
+			}else{
+				out << g.render(contextPath: pluginContextPath, template: defaultTemplate, model: map)
+			}
+
+		//}
+	}
+	
 	private void genDefinedValueScript(String actionNonAppendThis, String value, String setId,String user, String job) {
 		if (value) {
 			// Moved to gsp template - so that you can override
@@ -260,7 +311,6 @@ class BoSelectaTagLib extends ConfService implements ClientSessions {
 		}
 	}
 	
-
 	private Map createDomainMap(attrs) {
 		int a=3
 		def multiDomainMap = [:]

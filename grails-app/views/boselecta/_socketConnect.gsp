@@ -22,7 +22,7 @@
 
 	function processMessage( message) {
 	
-		//console.log(JSON.stringify(message.data));
+		console.log(JSON.stringify(message.data));
 		
 		var jsonData = JSON.parse(message.data);
 		if (jsonData.message!=null) {
@@ -31,10 +31,14 @@
 			
 				var jsonData1 = JSON.parse(jsonData.message);
 				var appendValue, appendName, updated, updateValue, nextValue,formatting='';
+				//auto comp
+				var cId,updateList='';
 				
 				if (jsonData1.updateThisDiv!=null) {
 					setId=jsonData1.updateThisDiv;
 				}
+				
+				
 				
 				if (jsonData1.appendValue!=null) {
 					appendValue=jsonData1.appendValue;
@@ -62,22 +66,45 @@
 					updateValue=jsonData1.updateValue;
 				}
 				
+				// Select function
 				if (jsonData1.result!=null) {
 				    var jsonResult = jsonData1.result;
 				    updateView(jsonResult, setId, appendName, appendValue, updated, updateValue, nextValue,formatting);
+				
+					for (a=3; a < 10; a++) {
+						var c=a;
+						try {
+							var cid = eval('jsonData1.setId'+c);
+					 		if (cid!=null) {
+					 			var jsonResult = eval('jsonData1.result'+c);
+					 			updateOtherView(jsonResult, cid, updateValue,formatting);
+							}
+						} catch(ex) {
+						}	
+					}
 				}
 				
-				for (a=3; a < 10; a++) {
-				var c=a;
-				try {
-					var cid = eval('jsonData1.setId'+c);
-					 if (cid!=null) {
-					 	var jsonResult = eval('jsonData1.result'+c);
-					 	updateOtherView(jsonResult, cid, updateValue,formatting);
-					}
-				} catch(ex) {
-				}	
+				//Auto Complete function
+				
+				if (jsonData1.cId!=null) {
+					cId=jsonData1.cId;
 				}
+				
+				if (jsonData1.updateList!=null) {
+					updateList=jsonData1.updateList;
+				}
+				
+					if (jsonData1.updateAutoValue!=null) {
+						updateAutoValue=jsonData1.updateAutoValue;
+					}
+				
+				
+				
+				if (jsonData1.autoResult!=null) {
+					var autoResult = jsonData1.autoResult;
+					 updateAutoView(autoResult, cId, setId, appendName, appendValue, updated, updateValue, nextValue,formatting, updateList);
+				}
+				
 			}	
 		}
 
@@ -124,7 +151,24 @@ function updateOtherView(jsonResult,cid, updateValue,format) {
 		}
 	});
 }
- 
+
+function updateAutoView(jsonResult, cId, setId, appendName, appendValue, updated, updateValue,
+ nextValue,format, updateList) {
+ console.log('--->'+jsonResult+"---"+updateList+"---"+cId+"----------");
+	var dataList = document.getElementById(updateList);
+	var input = document.getElementById(setId);
+	while (dataList.firstChild){
+       dataList.removeChild(dataList.firstChild);
+    }
+	jsonResult.forEach(function(item) {
+        var option = document.createElement('option');
+        option.value = item.id;
+        option.label = item.label;
+        dataList.appendChild(option);
+    });
+} 
+
+
 function updateView(jsonResult, setId, appendName, appendValue, updated, updateValue, nextValue,format) {
 	var id, name,resarray='';
 	var rselect = document.getElementById(setId);
