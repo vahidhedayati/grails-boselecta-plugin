@@ -41,8 +41,20 @@ grails run-app
 ###Config.groovy overrides:
 ```groovy
 
+/* Add this option to return all results as JSON, otherwise add formatting to 
+* <bo:selecta tag lib
+*/
+boselecta.formatting="JSON"
+
+/* Unlimited depth to your lookups.
+* Define a value default depth set as 10.
+* This is the depth of relations so Continents hasMany relations with 40 
+* other objects.
+*/
+boselecta.depth="40"
+
 /*
-* Very very optional values defaults are as per below _front-end and yes adds localhost:8080/yourappName/ to WebSocket connection line
+*  optional values defaults are as per below _front-end and yes adds localhost:8080/yourappName/ to WebSocket connection line
 */
 boselecta.front-enduser = '_front-end'
 boselecta.add.appName = 'yes'
@@ -53,6 +65,7 @@ boselecta.add.appName = 'yes'
 */ 
 
 
+/*NON REQUIRED */
 /*
 * Websocket hostname by default is localhost:8080
 * <bo:connect hostname='something'.... /> 
@@ -88,7 +101,7 @@ After plugin installation we have on a gsp an initial back-end  connection calle
 
 [Example 5: Defined pre selected values same as example3 but with JSON return object](https://github.com/vahidhedayati/testbo/blob/master/grails-app/views/test/definedselectvalues3.gsp)
 
-[Example 6: Multiple relationship per domainClass example i.e. object1 has many up to 18th relations with object2 3 4..18](https://github.com/vahidhedayati/testbo/blob/master/grails-app/views/test/multidomainexample.gsp)
+[Example 6: Multiple relationship per domainClass example i.e. object1 has many up to Xth relations with object2 3 4..XXX](https://github.com/vahidhedayati/testbo/blob/master/grails-app/views/test/multidomainexample.gsp)
 
 [Example 7: applicable to all methods - reuse of the taglib multiple times on the same page](https://github.com/vahidhedayati/testbo/blob/master/grails-app/views/test/multimultidomainexample.gsp)
 

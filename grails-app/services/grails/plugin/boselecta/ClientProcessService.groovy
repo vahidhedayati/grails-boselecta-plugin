@@ -113,9 +113,6 @@ public class ClientProcessService extends ConfService implements ClientSessions 
 		
 		boolean autoCompletePrimary = rmesg?.autoCompletePrimary?.toBoolean() ?: false
 
-
-		//println "${autoCompletePrimary} ${cId} ${setId}"
-
 		if (setId) {
 			Set<HashMap<String,String>> storedMap1= Collections.synchronizedSet(new HashSet<HashMap<String,String>>())
 
@@ -211,9 +208,10 @@ public class ClientProcessService extends ConfService implements ClientSessions 
 				boolean go = false
 				myMaper.each { s ->
 					go = false
-					//println "--${s} \n\n->${setId}\n\n--> ${updateDiv}"
-					if (s.setId == updateDiv) {
+					println "UPDATE AUTO VALUE: ${updateAutoValue}  ID: ${s.cId} | S.SETID: ${s.setId}SETID: ${setId} UpdateDIV: ${updateDiv}\n\n"
+					if (s.cId == setId) {
 						go = true
+						setId = s.setId
 						secondary = s.secondary
 						collectfield = s.collectfield
 						searchField = s.searchField
@@ -230,11 +228,13 @@ public class ClientProcessService extends ConfService implements ClientSessions 
 						
 					}
 					if (go) {
-						def res = autoCompleteService.autocompletePrimaryAction (primary, searchField, collectfield, order, max, updateAutoValue)
-						Map mresult = [ autoResult: res,updateThisDiv: updateDiv, cId: cId,  appendName: appendName, appendName: appendName,
+						//println "PRIMARY : ${primary} sF: ${searchField} cF: ${collectfield} O: ${order} M: ${max} UV: ${updateAutoValue} BINDID: ${bindId}"
+						def res = autoCompleteService.selectDomainClass(primary,  searchField,  collectfield, bindId, updateAutoValue)
+						//autocompletePrimaryAction (primary, searchField, , order, max, updateAutoValue)
+						Map mresult = [autoResult: res,  setId: setId, updateThisDiv: updateDiv, cId: cId,  appendName: appendName, appendName: appendName,
 							nextValue:nextValue,updated:updated, updateValue:updateValue, formatting:formatting, updateList:updateList]
-						println "---_____________________________> ${res}"
-						println "${mresult}"
+						//println "Primary: ${res}\n\n"
+						//println "FINAL TO SEND: ${mresult}\n\n"
 						clientListenerService.sendFrontEndPM(userSession, username,(mresult as JSON).toString())
 
 					}

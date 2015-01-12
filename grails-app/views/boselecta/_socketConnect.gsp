@@ -22,7 +22,7 @@
 
 	function processMessage( message) {
 	
-		console.log(JSON.stringify(message.data));
+		//console.log(JSON.stringify(message.data));
 		
 		var jsonData = JSON.parse(message.data);
 		if (jsonData.message!=null) {
@@ -154,7 +154,7 @@ function updateOtherView(jsonResult,cid, updateValue,format) {
 
 function updateAutoView(jsonResult, cId, setId, appendName, appendValue, updated, updateValue,
  nextValue,format, updateList) {
- console.log('--->'+jsonResult+"---"+updateList+"---"+cId+"----------");
+// console.log('--->'+jsonResult+"---"+updateList+"---"+cId+"----------");
 	var dataList = document.getElementById(updateList);
 	var input = document.getElementById(setId);
 	while (dataList.firstChild){
@@ -163,7 +163,7 @@ function updateAutoView(jsonResult, cId, setId, appendName, appendValue, updated
 	jsonResult.forEach(function(item) {
         var option = document.createElement('option');
         option.value = item.id;
-        option.label = item.label;
+        option.label = item.name;
         dataList.appendChild(option);
     });
 } 
