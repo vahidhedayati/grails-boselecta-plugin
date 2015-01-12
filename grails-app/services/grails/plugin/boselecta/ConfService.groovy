@@ -13,14 +13,7 @@ class ConfService {
 	}
 
 	Integer getDepth() {
-		
-		int result = (config.depth ?: '10') as int 
-		//if (result > 18) {
-		//	result= 18
-		//} 
-		return result
-		
-		//return (config.depth ?: '10') as int
+		return (config.depth ?: '10') as int 
 	} 
 	
 	String getFrontend() {
