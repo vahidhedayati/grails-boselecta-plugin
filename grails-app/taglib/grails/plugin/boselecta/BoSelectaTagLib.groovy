@@ -81,21 +81,13 @@ class BoSelectaTagLib extends ConfService implements ClientSessions {
 
 		// Reset the map - now held in userSession no need
 		//clientListenerService.truncateStoredMap(oSession , job)
-
+		
 		Map model = [  message : message, job: job, hostname: hostname, actionMap: actionMap,
 			appName: appName, frontuser:frontuser,  user: user,  receivers: receivers, divId: divId,
 			chatApp: APP, addAppName: addAppName ]
-
-		String userTemplate = attrs.socketConnectTemplate ?: config.socketConnectTemplate ?: ''
-		String defaultTemplate= "/${VIEW}/socketConnect"
-
-		// Now load up the socketProcess template - which does the front end connection
-		if (userTemplate) {
-			out << g.render(template:userTemplate, model:model)
-		}else{
-			out << g.render(contextPath: pluginContextPath, template: defaultTemplate, model: model)
-		}
-
+		
+		loadTemplate(attrs,'socketConnect', model)
+		
 		if (sendType == 'message') {
 			if (receivers) {
 				clientListenerService.sendArrayPM(oSession, job, message)
@@ -107,16 +99,9 @@ class BoSelectaTagLib extends ConfService implements ClientSessions {
 		if (autodisco) {
 			clientListenerService.disconnect(oSession)
 		}
-
-		userTemplate = attrs.socketProcessTemplate ?: config.socketProcessTemplate ?: ''
-		defaultTemplate = "/${VIEW}/socketProcess"
-
-		if (userTemplate) {
-			out << g.render(template:userTemplate, model: [job: job])
-		}else{
-			out << g.render(contextPath: pluginContextPath, template: defaultTemplate, model: [job: job])
-		}
-
+		
+		Map map2 = [job: job]
+		loadTemplate(attrs,'socketProcess', map2)
 	}
 
 
@@ -160,15 +145,6 @@ class BoSelectaTagLib extends ConfService implements ClientSessions {
 		if (!id) {
 			throwTagError("Tag [multiSelect] is missing required attribute [id]")
 		}
-
-
-		//if (!domain2) {
-		//	throwTagError("Tag [multiSelect] is missing required attribute [domain2]")
-		//}
-
-		//if (!bindid) {
-		//	throwTagError("Tag [multiSelect] is missing required attribute [bindid]")
-		//}
 
 		searchField2 = searchField2 ?: searchField
 		if (!searchField2) {
@@ -222,9 +198,11 @@ class BoSelectaTagLib extends ConfService implements ClientSessions {
 		
 		// AutoComplete box
 		if (autoComplete) {
-			genAutoComp(attrs.genAutoComplete, id,  placeHolder,  setId, collectField, searchField, user, job, value, name, 
-				dataList, sDataList, autoCompletePrimary, autoCompleteToSelect)
+			Map map = [value: value, setId:setId, user:user, job:job, name:name, dataList:dataList, searchField:searchField,
+				collectField: collectField, id:id, placeHolder:placeHolder, sDataList:sDataList, autoCompleteToSelect:autoCompleteToSelect]
+			loadTemplate(attrs,'genAutoComplete', map)
 		}
+		
 		// Select Box
 		else{
 			
@@ -270,44 +248,25 @@ class BoSelectaTagLib extends ConfService implements ClientSessions {
 
 		def cc=message as JSON
 		clientListenerService.sendJobMessage(job, cc as String)
+		
 		if (value||nextValue) {
-			genDefinedValueScript(attrs.actionNonAppendThis,value,  setId, user, job)
-		}
-	}
-	
-	private void genAutoComp(String genAutoComplete, String id, String placeHolder, String setId, 
-		String collectField, String searchField, String user, String job, String value,
-		 String name, String dataList, String sDataList, boolean autoCompletePrimary, boolean autoCompleteToSelect) {
-			// Moved to gsp template - so that you can override
-			def userTemplate = genAutoComplete ?: config.genAutoComplete
-			def defaultTemplate = "/${VIEW}/genAutoComplete"
-			
-			Map map = [value: value, setId:setId, user:user, job:job, name:name, dataList:dataList, searchField:searchField, 
-				collectField: collectField, id:id, placeHolder:placeHolder, sDataList:sDataList, autoCompleteToSelect:autoCompleteToSelect]
-			
-			if (userTemplate) {
-				out << g.render(template:userTemplate, model: map)
-			}else{
-				out << g.render(contextPath: pluginContextPath, template: defaultTemplate, model: map)
-			}
-	}
-	
-	private void genDefinedValueScript(String actionNonAppendThis, String value, String setId,String user, String job) {
-		if (value) {
-			// Moved to gsp template - so that you can override
-			def userTemplate = actionNonAppendThis ?: config.actionNonAppendThis
-			def defaultTemplate = "/${VIEW}/actionNonAppendThis"
-
 			Map map = [value: value, setId:setId, user:user, job:job]
-			if (userTemplate) {
-				out << g.render(template:userTemplate, model: map)
-			}else{
-				out << g.render(contextPath: pluginContextPath, template: defaultTemplate, model: map)
-			}
-
+			loadTemplate(attrs,'actionNonAppendThis', map)
 		}
 	}
 	
+
+	 // Moved to gsp templates - so that you can override given template name
+	 private void loadTemplate(attrs, String template, Map myMap) {
+		 def userTemplate = attrs."${template}" ?: config."${template}"
+		 def defaultTemplate = "/${VIEW}/${template}"
+		 if (userTemplate) {
+			 out << g.render(template:userTemplate, model: myMap)
+		 }else{
+			 out << g.render(contextPath: pluginContextPath, template: defaultTemplate, model: myMap)
+		 }
+	 }
+
 	private Map createDomainMap(attrs) {
 		int a=3
 		def multiDomainMap = [:]

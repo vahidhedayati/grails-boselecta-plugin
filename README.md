@@ -71,7 +71,7 @@ boselecta.add.appName = 'yes'
 */ 
 
 
-/*NON REQUIRED */
+/*NON REQUIRED taglib/Config values for taglib remove boselecta. */
 /*
 * Websocket hostname by default is localhost:8080
 * <bo:connect hostname='something'.... /> 
@@ -82,15 +82,19 @@ boselecta.hostname = 'your WebSockethostname'
 * Websocket _socketConnect by default is {/plugin/views}/boselecta/_socketConnect.gsp
 *<bo:connect socketConnectTemplate='something'.... /> 
 */
-boselecta.socketConnectTemplate = '/path/to/process/template'
+boselecta.socketConnect = '/path/to/process/template'
  
  /*
  * Websocket socketProcessTemplate by default is {/plugin/views}/boselecta/_socketProcess.gsp
  *<bo:selecta socketProcessTemplate='something'.... /> 
  */
-boselecta.socketProcessTemplate = '/path/to/process/template'
+boselecta.socketProcess = '/path/to/process/template'
 
 
+
+boselecta.genAutoComplete = '/path/to/process/template'
+
+boselecta.actionNonAppendThis = '/path/to/process/template'
 ```
 
 
