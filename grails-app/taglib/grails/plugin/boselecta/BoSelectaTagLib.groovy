@@ -207,6 +207,7 @@ class BoSelectaTagLib extends ConfService implements ClientSessions {
 		List primarylist = []
 
 		if ((domain) && (bindid && (bindid.endsWith('.id'))||(norefPrimary))) {
+			//primarylist = autoCompleteService.returnPrimaryList(domain, searchField, collectField)
 			primarylist = autoCompleteService.returnPrimaryList(domain)
 		}
 		
@@ -217,8 +218,8 @@ class BoSelectaTagLib extends ConfService implements ClientSessions {
 		
 		// AutoComplete box
 		if (autoComplete) {
-			genAutoComp(attrs.genAutoComplete, id,  placeHolder,  setId, collectField, searchField, user, 
-				job, value, name, dataList, sDataList, autoCompletePrimary)
+			genAutoComp(attrs.genAutoComplete, id,  placeHolder,  setId, collectField, searchField,
+				 user, job, value, name, dataList, sDataList, autoCompletePrimary)
 		}
 		// Select Box
 		else{
@@ -246,11 +247,9 @@ class BoSelectaTagLib extends ConfService implements ClientSessions {
 
 		// Generate Message which is initial map containing default containing 
 		// result set that then needs to be appended
-		def message = [setId: "${setId}", secondary: "${domain2}", collectfield: "${collectField2}",
-			searchField:  "${searchField2}", appendValue: appendValue, appendName: appendName, job:job, 
-			formatting:formatting, nextValue:nextValue, primary: "${domain}", max:max, order:order, cId: id,
-			autoCompletePrimary:autoCompletePrimary, dataList:dataList, sDataList:sDataList
-			]
+		def message = [setId: setId, secondary: domain2, primaryCollect: collectField, collectfield: collectField2,	primarySearch: searchField, 
+			searchField:  searchField2, appendValue: appendValue, appendName: appendName, job:job, formatting:formatting, nextValue:nextValue, 
+			primary: domain, max:max, order:order, cId: id,	autoCompletePrimary:autoCompletePrimary, dataList:dataList, sDataList:sDataList]
 
 		if (bindid) {
 			message.put('bindId', bindid)
@@ -270,29 +269,17 @@ class BoSelectaTagLib extends ConfService implements ClientSessions {
 	private void genAutoComp(String genAutoComplete, String id, String placeHolder, String setId, 
 		String collectField, String searchField, String user, String job, String value,
 		 String name, String dataList, String sDataList, boolean autoCompletePrimary) {
-		 
-		//if (value) {
-			//println "--- genAutoComplete"
 			// Moved to gsp template - so that you can override
 			def userTemplate = genAutoComplete ?: config.genAutoComplete
-			def defaultTemplate
-			//if (autoCompletePrimary) {
-			//	defaultTemplate = "/${VIEW}/genAutoCompletePrimary"
-			//}else{
-				defaultTemplate = "/${VIEW}/genAutoComplete"
-			//}
-
-			Map map = [value: value, setId:setId, user:user, job:job, name:name, dataList:dataList, 
-				searchField:searchField, collectField: collectField, id:id, placeHolder:placeHolder, 
-				sDataList:sDataList]
-			println "TAGLIB MAP : ${map}"
+			def defaultTemplate = "/${VIEW}/genAutoComplete"
+			
+			Map map = [value: value, setId:setId, user:user, job:job, name:name, dataList:dataList, searchField:searchField, 
+				collectField: collectField, id:id, placeHolder:placeHolder, sDataList:sDataList]
 			if (userTemplate) {
 				out << g.render(template:userTemplate, model: map)
 			}else{
 				out << g.render(contextPath: pluginContextPath, template: defaultTemplate, model: map)
 			}
-
-		//}
 	}
 	
 	private void genDefinedValueScript(String actionNonAppendThis, String value, String setId,String user, String job) {

@@ -63,7 +63,6 @@ public class ClientListenerService extends ConfService implements UserSessions, 
 	def sendFrontEndPM(Session userSession, String user,String message) {
 		
 		def found=findUser(user+frontend)
-		println "--- ${user} ${message} --> ${found}"
 		userSession.basicRemote.sendText("/pm ${user+frontend},${message}")
 		// TODO
 		// Should work with above call  - take a look at this

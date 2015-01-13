@@ -154,7 +154,7 @@ function updateOtherView(jsonResult,cid, updateValue,format) {
 
 function updateAutoView(jsonResult, cId, setId, appendName, appendValue, updated, updateValue,
  nextValue,format, updateList) {
-// console.log('--->'+jsonResult+"---"+updateList+"---"+cId+"----------");
+
 	var dataList = document.getElementById(updateList);
 	var input = document.getElementById(setId);
 	while (dataList.firstChild){

@@ -44,14 +44,13 @@ class AutoCompleteService {
 				order(searchField)
 			}
 			if (query) {
-				primarySelectList=resultSet2(query as List)
+				primarySelectList=resultSet(query as List)
 			}
 		}
 		return primarySelectList
 	}
 
-
-	def resultSet2(def results) {
+	def resultSet(def results) {
 		def primarySelectList=[]
 		if (results) {
 			results.each {
@@ -74,15 +73,32 @@ class AutoCompleteService {
 
 	def returnAutoList(String className, String searchField, String collectField) {
 		def results
-		if (!className.equals('')) {
+		if (className) {
 			Class clazz = grailsApplication?.getDomainClass(className)?.clazz
-			clazz.withTransaction { 
+			clazz.withTransaction {
 				def res = clazz.findAll()
-				results = res?.collect {[	'id': it."${collectField}", 'name': it."${searchField}" ]}?.unique()
+				results = res?.collect {[	'id': it."${collectField}", 'name': it."${searchField}" ,
+						'resarray': [it."${collectField}", it."${searchField}" ]]}?.unique()
 			}
 			return results
 		}
 	}
+	
+	/*
+	 def returnPrimaryList(String className,String searchField, String collectField ) {
+	 def results
+	 if (className) {
+		 Class clazz = grailsApplication?.getDomainClass(className)?.clazz
+		 clazz.withTransaction {
+			 def res = clazz.findAll()
+			 results = res?.collect {[	'id': it."${collectField}", 'name': it."${searchField}" ,
+					 'resarray': [it."${collectField}", it."${searchField}" ]]}?.unique()
+		 }
+		 return results
+	 }
+	 }*/
+ 
+
 
 
 }
