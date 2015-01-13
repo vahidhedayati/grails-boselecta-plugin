@@ -148,6 +148,10 @@ class BoSelectaTagLib extends ConfService implements ClientSessions {
 		boolean autoComplete = attrs.remove('autoComplete')?.toBoolean() ?: false
 		boolean autoCompletePrimary = attrs.remove('autoCompletePrimary')?.toBoolean() ?: false
 		
+		boolean selectToAutoComplete = attrs.remove('selectToAutoComplete')?.toBoolean() ?: false
+
+		
+		
 		// Format can be set as JSON
 		String formatting = attrs.remove('formatting').toString() ?: config.formatting ?: 'none'
 
@@ -234,8 +238,14 @@ class BoSelectaTagLib extends ConfService implements ClientSessions {
 				gsattrs['required'] = 'required'
 			}
 
-			// 	Front End JAVA Script actioned by socketProcess gsp template
-			gsattrs['onchange'] = "javascript:actionThis(this.value, '${setId}', '${user}', '${job}');"
+			
+			if (selectToAutoComplete) { 
+				gsattrs['onchange'] = "javascript:updateList(this.value, '${id}',  '${sDataList}', '${setId}');"
+				
+			}else{
+				// 	Front End JAVA Script actioned by socketProcess gsp template
+				gsattrs['onchange'] = "javascript:actionThis(this.value, '${setId}', '${user}', '${job}');"
+			}
 
 			// Parse taglib call for domain3..domainX and its setId's searchField and collectFields.....
 			// Add to a map called multiDomainMap

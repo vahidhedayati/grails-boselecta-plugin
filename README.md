@@ -5,9 +5,9 @@ Grails WebSocket Multi select plugin, a secure way of interacting with multi dom
 
 This is a result of security issues faced by many who used [ajaxdependancyselection plugin](https://github.com/vahidhedayati/ajaxdependancyselection). 
 
-### This plugin is JQUERY and JQUERY-UI FREE - It will require your end user to have a browser with websocket support. 
-### Select box dependencies data comes from WebSocket Client running within your application (as part of the plugin)
-### AutoComplete input areas use HTML5 dataList, data for dataList provided by backend WebSocket Connection.
+##### This plugin is JQUERY and JQUERY-UI FREE - It will require your end user to have a browser with websocket support. 
+##### Select box dependencies data comes from WebSocket Client running within your application (as part of the plugin)
+##### AutoComplete input areas use HTML5 dataList, data for dataList provided by backend WebSocket Connection.
  
 
  ### Video
@@ -115,9 +115,12 @@ After plugin installation we have on a gsp an initial back-end  connection calle
 
 [Example 10: Primary object with a No reference relationship ](https://github.com/vahidhedayati/testbo/blob/master/grails-app/views/test/norefprimary.gsp)
 
-[Example 11: Auto complete](https://github.com/vahidhedayati/testbo/blob/master/grails-app/views/test/autoComplete.gsp)
+[Example 11: Auto complete a few hasMany to a noref relation](https://github.com/vahidhedayati/testbo/blob/master/grails-app/views/test/autoComplete.gsp)
 
-[Example 12: Select TO Auto complete -- NOT WORKING AS YET](https://github.com/vahidhedayati/testbo/blob/master/grails-app/views/test/selectautoComplete.gsp) 
+[Example 12: Select TO Auto complete](https://github.com/vahidhedayati/testbo/blob/master/grails-app/views/test/selectautoComplete.gsp) 
+
+
+##### Please review the taglib calls in the examples above, they all look/appear the same but internally there is a small variation between the different type of calls. Refer to actual domainClasses in the example project and the taglib calls to understand how it is working
 
 
 
