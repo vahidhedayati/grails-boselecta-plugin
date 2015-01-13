@@ -50,7 +50,7 @@ This is a result of security issues faced by many who used [ajaxdependancyselect
 
 [Video 4 - Final wrap up and a look into auto complete from autocomp to select + vice versa](https://www.youtube.com/watch?v=i5ksVE8KU8o)
 
-Demo site used for videos with data provided in BootStrap](https://github.com/vahidhedayati/testbo). 
+
 
  BoSelecta can be incorporated to an existing grails app running ver 2>+. Supports both resource (pre 2.4) /assets (2.4+) based grails sites.
 
@@ -91,24 +91,36 @@ boselecta.formatting="JSON"
 */
 boselecta.depth="40"
 
-/*
-*  optional values defaults are as per below _front-end and yes adds localhost:8080/yourappName/ to WebSocket connection line
-*/
-boselecta.front-enduser = '_front-end'
-boselecta.add.appName = 'yes'
 
 
-/*
-* The 3 items below can be either provided by Config.groovy or remove boselecta and add items to taglib calls 
-*/ 
-
-
-/*NON REQUIRED taglib/Config values for taglib remove boselecta. */
 /*
 * Websocket hostname by default is localhost:8080
 * <bo:connect hostname='something'.... /> 
 */
-boselecta.hostname = 'your WebSockethostname'
+boselecta.hostname = 'localhost:8080'
+
+
+
+	/*
+		* NON REQUIRED taglib/Config values below
+ 		* for taglib remove boselecta.
+ 		* Please do not bother setting these unless you are changing something 
+ 	*/
+
+ 
+/*
+*  front end user default is _front-end
+*/ 
+boselecta.front-enduser = '_front-end'
+
+/* addAppName by default is yes set to no if you do not want url like:
+* {host}/yourappName/ to WebSocket connection line
+*/
+boselecta.add.appName = 'yes'
+
+
+// Websocket timeout by default is 0
+boselecta.timeout = 0 
 
 /*
 * Websocket _socketConnect by default is {/plugin/views}/boselecta/_socketConnect.gsp
@@ -126,6 +138,7 @@ boselecta.socketProcess = '/path/to/process/template'
 boselecta.genAutoComplete = '/path/to/process/template'
 
 boselecta.actionNonAppendThis = '/path/to/process/template'
+
 ```
 
 
@@ -161,19 +174,22 @@ After plugin installation we have on a gsp an initial back-end  connection calle
 
 [Example 14: AutoComplete To Select from select to another select](https://github.com/vahidhedayati/testbo/blob/master/grails-app/views/test/selectautoComplete2.gsp) 
 
-##### Please review the taglib calls in the examples above, they all look/appear the same but internally there is a small variation between the different type of calls. Refer to actual domainClasses in the example project and the taglib calls to understand how it is working
+
+##### Above examples should provide a good base to figure out how to use with your own domainClasses.
+
+Refer to actual domainClasses in the example project and review the taglib calls, since they all appear very similar in the way they work, the variation is enabing speific options or adding certain calls to the same call method.
 
 
 
-##### What is front-end / backend WebSocket connections ?
-Ok apologies since its probably my bad description of the actual process.
+##### What is front-end / back-end WebSocket connections ?
 
-By front end I mean a typical web page connection to a WebSocket session. So this is where the <bo:connect TagLib does two WebSocket tasks
+Front-end means a typical web page connection to a WebSocket session. So this is where the <bo:connect TagLib does two WebSocket tasks
 
 1. It triggers a client connection (described as backend). The client connection is a call to [BoSelectaClientEndpoint.groovy](https://github.com/vahidhedayati/grails-boselecta-plugin/blob/master/src/groovy/grails/plugin/boselecta/BoSelectaClientEndpoint.groovy). This initiates an internal WebSocket connection that behaves like a typical client and logs in the user as the user you have defined within your connect tag lib definition. So this is now your backend connected and awaiting response from front end described in next step.
 
-2. Right at the end of the taglib it loads in [_socketConnect.gsp](https://github.com/vahidhedayati/grails-boselecta-plugin/blob/master/grails-app/views/boselecta/_socketConnect.gsp). This is now your front-end user and logs in as user_frontend unless you override it to be something else. (its all internal so need to touch this to be honest).
+2. Right at the end of the taglib it loads in [_socketConnect.gsp](https://github.com/vahidhedayati/grails-boselecta-plugin/blob/master/grails-app/views/boselecta/_socketConnect.gsp). This is now your front-end user and logs in as user_frontend 
+
 None of the users visibly interact on the web interface. The only thing that gets sent is the [_socketProcess.gsp](https://github.com/vahidhedayati/grails-boselecta-plugin/blob/master/grails-app/views/boselecta/_socketProcess.gsp]). Which gets called in each time you call bo:selecta
 
-With this in place when you update a value on your front end,the back-end has a map which  is bound to each users session. So front end sends changedValue + divId to update. Back-end knows internally what domains etc it was and it triggers the AutoCompleteService, finally the results is returned with the divId and what the json result set that it fills in the blank from=[] within select tag.
+With this in place when you update a value on your front-end,the back-end has a map which  is bound to each users session. So front end sends changedValue + divId to update. Back-end knows internally what domains etc it was and it triggers the AutoCompleteService, finally the results is returned with the divId and what the json result set that it fills in the blank from=[] within select tag.
 
