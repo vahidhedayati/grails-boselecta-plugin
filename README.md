@@ -1,7 +1,37 @@
 Bo selecta! 
 =========
 
-Grails WebSocket Multi select plugin, a secure way of interacting with multi domains. Messages sent from front-end socket connection to back-end socket connection which produces JSON list and sends back only result set to front-end defined divId.
+Grails plugin that uses default WebSocket technology to interact with your domainClasses and produce dependent form / options that depend on one another. The format to define select functionality / auto complete are identical. Auto complete requires additional boolean values to be passed to make it auto complete.
+
+The information that appears on your front end web page is passed via a socket connection that is activated initially, so only selected items and their dependent lists are ever loaded at any one time.
+
+This is a secure way of interacting with any of your given domainClasses that have a hasMany/belongsTo(full / loose) dependencies supported. 
+
+Before any confusion arises in regards to depth. The plugin by default supports unlimited depth going forwards. so item a depends on b depends on c and it can go on an on. The depth configuration provided is for direct relationships so object A has direct relations with 40 other domainClasses. This means 
+
+```
+Class a {
+  static hasMany=[1:1,2:2...XX]
+  }
+ ```
+  
+ Where XX is the depth you define, by default I am going to reduce to 4 and if you have a need to define more relations directly more than this then override the config value (found discussed further down)
+ 
+ This would only be used where you define 
+ 
+ ```
+ domain2 = "somePackage/somDomainClass"
+ domain3 = "somePackage/somDomainClass"
+ domain4 = "somePackage/somDomainClass"
+ ...  
+ ```
+ 
+ Refer to multi select pages to understand what this is all about
+ 
+ 
+    
+When selections are made the backend initially keeps a map of user definitions per call/job. When a request comes in, the format is this is my divId the value is this this is my job and username...
+The backend then finds the relevant map that has the domain details for this call and passes the value to process. It then returns the full dependent result set as JSON through websockets (this being the backend user connected via the ClientProcess.groovy). To the front end webpage user. The webpage user picks up JSON result set and ammends either the select or dataList options list relevant div ID.
 
 This is a result of security issues faced by many who used [ajaxdependancyselection plugin](https://github.com/vahidhedayati/ajaxdependancyselection). 
 
@@ -19,6 +49,8 @@ This is a result of security issues faced by many who used [ajaxdependancyselect
 [Video 3 no ref/loose dependencies + randomizing username](https://www.youtube.com/watch?v=7FxYJjMLSjQ)
 
 [Video 4 - Final wrap up and a look into auto complete from autocomp to select + vice versa](https://www.youtube.com/watch?v=i5ksVE8KU8o)
+
+Demo site used for videos with data provided in BootStrap](https://github.com/vahidhedayati/testbo). 
 
  BoSelecta can be incorporated to an existing grails app running ver 2>+. Supports both resource (pre 2.4) /assets (2.4+) based grails sites.
 
@@ -89,7 +121,6 @@ boselecta.socketConnect = '/path/to/process/template'
  *<bo:selecta socketProcessTemplate='something'.... /> 
  */
 boselecta.socketProcess = '/path/to/process/template'
-
 
 
 boselecta.genAutoComplete = '/path/to/process/template'
