@@ -179,6 +179,17 @@ After plugin installation we have on a gsp an initial back-end  connection calle
 
 Refer to actual domainClasses in the example project and review the taglib calls, since they all appear very similar in the way they work, the variation is enabing speific options or adding certain calls to the same call method.
 
+#### JSON Formatting.
+Besides your first object everything else gets passed back as a JSON string result set containing select id and its value, to parse these refer to the demo project [test controller](https://github.com/vahidhedayati/testbo/blob/master/grails-app/controllers/testbo/TestController.groovy#L57), here is an example:
+```groovy
+if (params.MyCity11) {
+ JSONObject myCity=JSON?.parse(params.MyCity11)
+ if (myCity) {
+  cId = myCity?.get('selected')
+  cName = myCity?.get('selectedText')
+ }
+}
+```
 
 
 ##### What is front-end / back-end WebSocket connections ?

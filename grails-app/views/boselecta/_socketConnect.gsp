@@ -87,15 +87,15 @@
 				//Auto Complete function
 				
 				if (jsonData1.cId!=null) {
-					cId=jsonData1.cId;
+					cId = jsonData1.cId;
 				}
 				
 				if (jsonData1.updateList!=null) {
-					updateList=jsonData1.updateList;
+					updateList = jsonData1.updateList;
 				}
 				
 					if (jsonData1.updateAutoValue!=null) {
-						updateAutoValue=jsonData1.updateAutoValue;
+						updateAutoValue = jsonData1.updateAutoValue;
 					}
 				
 				
@@ -109,8 +109,8 @@
 		}
 
 	// Log out user if system tells it to	
-	if (jsonData.system!=null) {
-		if (jsonData.system=="disconnect") { 
+	if (jsonData.system != null) {
+		if (jsonData.system == "disconnect") { 
 			webSocket${job}.send("DISCO:-"+user);
 			webSocket${job}.close();
 		}
@@ -124,21 +124,21 @@ function updateOtherView(jsonResult,cid, updateValue,format) {
 		var rselect = document.getElementById(cid);
 		if (rselect) {
 			var opt = document.createElement('option');
-			if (entry.id!=null) {
+			if (entry.id != null) {
 				id=entry.id;
 			}
-			if (entry.name!=null) {
+			if (entry.name != null) {
 				name=entry.name;
 			}
 			
 			
 			if (format == "JSON") {
-				opt.value=JSON.stringify(resarray);
+				opt.value = JSON.stringify(resarray);
 			}else{
-				opt.value=name;
+				opt.value = name;
 			}
 			opt.text=id
-			if (id==updateValue) {
+			if (id == updateValue) {
 				//opt.checked=true;
 				opt.setAttribute('selected', true);
 			}
@@ -163,7 +163,12 @@ function updateAutoView(jsonResult, cId, setId, appendName, appendValue, updated
 	jsonResult.forEach(function(item) {
         var option = document.createElement('option');
         option.value = item.id;
-        option.label = item.name;
+        if (format == "JSON") {
+				option.label = JSON.stringify(item.resarray);
+		}else{
+				option.label = item.name;
+		}
+			
         dataList.appendChild(option);
     });
 } 
@@ -180,8 +185,8 @@ function updateView(jsonResult, setId, appendName, appendValue, updated, updateV
 
 	if ((appendName!="")&&(updated=="yes")) { 	
 		var opt = document.createElement('option');
-		opt.value=appendValue;
-		opt.text=appendName;
+		opt.value = appendValue;
+		opt.text = appendName;
 		try {
 			rselect.add(opt, null);
 		} catch(ex) {
@@ -195,15 +200,15 @@ function updateView(jsonResult, setId, appendName, appendValue, updated, updateV
 			id=entry1.id;
 		}
 		if (entry1.resarray!=null) {
-			resarray=entry1.resarray;
+			resarray = entry1.resarray;
 		}
 		if (entry1.name!=null) {
-			name=entry1.name;
+			name = entry1.name;
 		}
 		if (format == "JSON") {
-				opt.value=JSON.stringify(resarray);
+				opt.value = JSON.stringify(resarray);
 			}else{
-				opt.value=name;
+				opt.value = name;
 			}
 		opt.text=id
 			if (name==nextValue) {
