@@ -2,6 +2,8 @@ package grails.plugin.boselecta
 
 import grails.converters.JSON
 
+import org.codehaus.groovy.grails.web.json.JSONObject
+
 
 
 class AutoCompleteService {
@@ -36,7 +38,7 @@ class AutoCompleteService {
 		if (domainClaz && bindName) {
 			def domainClass = grailsApplication?.getDomainClass(domainClaz)?.clazz
 			def query = domainClass.withCriteria {
-				eq  (bindName as String,  recordId.toLong())
+				eq  (bindName as String,  parseRecord(recordId).toLong())
 				projections {
 					property(collectField)
 					property(searchField)
@@ -82,6 +84,17 @@ class AutoCompleteService {
 			}
 			return results
 		}
+	}
+	
+	private String parseRecord(String input) {
+		String cId = input
+		if (input.startsWith('{')) {
+			JSONObject res=JSON?.parse(input)
+			if (res) {
+				cId = res?.get('selected')
+			}
+		}
+		return cId
 	}
 	
 	/*
