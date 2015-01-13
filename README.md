@@ -18,6 +18,8 @@ This is a result of security issues faced by many who used [ajaxdependancyselect
 
 [Video 3 no ref/loose dependencies + randomizing username](https://www.youtube.com/watch?v=7FxYJjMLSjQ)
 
+[Video 4 - Final wrap up and a look into auto complete from autocomp to select + vice versa](https://www.youtube.com/watch?v=i5ksVE8KU8o)
+
  BoSelecta can be incorporated to an existing grails app running ver 2>+. Supports both resource (pre 2.4) /assets (2.4+) based grails sites.
 
 ###### Plugin will work with tomcat 7.0.54 + (inc. 8) running java 1.7+

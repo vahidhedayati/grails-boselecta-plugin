@@ -149,7 +149,7 @@ class BoSelectaTagLib extends ConfService implements ClientSessions {
 		boolean autoCompletePrimary = attrs.remove('autoCompletePrimary')?.toBoolean() ?: false
 		
 		boolean selectToAutoComplete = attrs.remove('selectToAutoComplete')?.toBoolean() ?: false
-
+		boolean autoCompleteToSelect = attrs.remove('autoCompleteToSelect')?.toBoolean() ?: false
 		
 		
 		// Format can be set as JSON
@@ -222,14 +222,13 @@ class BoSelectaTagLib extends ConfService implements ClientSessions {
 		
 		// AutoComplete box
 		if (autoComplete) {
-			genAutoComp(attrs.genAutoComplete, id,  placeHolder,  setId, collectField, searchField,
-				 user, job, value, name, dataList, sDataList, autoCompletePrimary)
+			genAutoComp(attrs.genAutoComplete, id,  placeHolder,  setId, collectField, searchField, user, job, value, name, 
+				dataList, sDataList, autoCompletePrimary, autoCompleteToSelect)
 		}
 		// Select Box
 		else{
 			
-			def gsattrs=['optionKey' : "${collectField}" , 'optionValue': "${searchField}",
-				'id': "${id}", 'value': "${value}", 'name': "${name}"]
+			def gsattrs=[optionKey: collectField , optionValue: searchField, id: id, value: value, name: name]
 
 			gsattrs['noSelection'] = attrs.noSelection
 			gsattrs['from'] = primarylist
@@ -278,13 +277,14 @@ class BoSelectaTagLib extends ConfService implements ClientSessions {
 	
 	private void genAutoComp(String genAutoComplete, String id, String placeHolder, String setId, 
 		String collectField, String searchField, String user, String job, String value,
-		 String name, String dataList, String sDataList, boolean autoCompletePrimary) {
+		 String name, String dataList, String sDataList, boolean autoCompletePrimary, boolean autoCompleteToSelect) {
 			// Moved to gsp template - so that you can override
 			def userTemplate = genAutoComplete ?: config.genAutoComplete
 			def defaultTemplate = "/${VIEW}/genAutoComplete"
 			
 			Map map = [value: value, setId:setId, user:user, job:job, name:name, dataList:dataList, searchField:searchField, 
-				collectField: collectField, id:id, placeHolder:placeHolder, sDataList:sDataList]
+				collectField: collectField, id:id, placeHolder:placeHolder, sDataList:sDataList, autoCompleteToSelect:autoCompleteToSelect]
+			
 			if (userTemplate) {
 				out << g.render(template:userTemplate, model: map)
 			}else{
