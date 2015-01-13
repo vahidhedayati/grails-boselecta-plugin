@@ -119,8 +119,12 @@ After plugin installation we have on a gsp an initial back-end  connection calle
 
 [Example 11: Auto complete a few hasMany to a noref relation](https://github.com/vahidhedayati/testbo/blob/master/grails-app/views/test/autoComplete.gsp)
 
-[Example 12: Select TO Auto complete](https://github.com/vahidhedayati/testbo/blob/master/grails-app/views/test/selectautoComplete.gsp) 
+[Example 12: Select To AutoComplete](https://github.com/vahidhedayati/testbo/blob/master/grails-app/views/test/selectautoComplete.gsp) 
 
+
+[Example 13:AutoComplete To Select](https://github.com/vahidhedayati/testbo/blob/master/grails-app/views/test/autoCompleteToSelect.gsp) 
+
+[Example 14: AutoComplete To Select from select to another select](https://github.com/vahidhedayati/testbo/blob/master/grails-app/views/test/selectautoComplete2.gsp) 
 
 ##### Please review the taglib calls in the examples above, they all look/appear the same but internally there is a small variation between the different type of calls. Refer to actual domainClasses in the example project and the taglib calls to understand how it is working
 
