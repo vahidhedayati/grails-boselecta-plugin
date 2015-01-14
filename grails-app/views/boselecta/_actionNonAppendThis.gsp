@@ -1,5 +1,5 @@
 <script type="text/javascript">
 	setTimeout(function(){
-		actionNonAppendThis('${value}', '${setId}', '${user}', '${job}');
+		actionNonAppendThis('${value}', '${setId}');
 	},600);
 </script>

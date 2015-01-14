@@ -1,6 +1,6 @@
 
 <input type="text" id="${id}" 
-onChange="<g:if test="${autoCompleteToSelect }">actionThis(this.value, '${setId}', '${user}', '${job}');</g:if>
+onChange="<g:if test="${autoCompleteToSelect }">actionThis(this.value, '${setId}');</g:if>
 <g:else>updateList(this.value, '${id}', '${sDataList}', '${setId}')</g:else>"
   list="${dataList}" name = "${name}" placeholder="${placeHolder ?: 'AutoComplete' }">
  

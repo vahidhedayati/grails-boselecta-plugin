@@ -221,7 +221,8 @@ class BoSelectaTagLib extends ConfService implements ClientSessions {
 				
 			}else{
 				// 	Front End JAVA Script actioned by socketProcess gsp template
-				gsattrs['onchange'] = "javascript:actionThis(this.value, '${setId}', '${user}', '${job}');"
+				//gsattrs['onchange'] = "javascript:actionThis(this.value, '${setId}', '${user}', '${job}');"
+				gsattrs['onchange'] = "javascript:actionThis(this.value, '${setId}');"
 			}
 
 			// Parse taglib call for domain3..domainX and its setId's searchField and collectFields.....

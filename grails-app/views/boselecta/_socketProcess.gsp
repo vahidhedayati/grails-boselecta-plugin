@@ -1,12 +1,12 @@
 
 
 <g:javascript>
-	function actionThis(value, divid, user, cjobName) {
-		webSocket${job}.send("/pm "+user+","+JSON.stringify({updateDiv : divid, updateValue : value, cjobName: cjobName}));
+	function actionThis(value, divid) {
+		webSocket${job}.send("/pm "+user+","+JSON.stringify({updateDiv : divid, updateValue : value}));
 	}
 
-	function actionNonAppendThis(value, divid, user, cjobName) {
-		webSocket${job}.send("/pm "+user+","+JSON.stringify({updateDiv : divid, updateValue : value, updated: 'no', cjobName: cjobName}));
+	function actionNonAppendThis(value, divid) {
+		webSocket${job}.send("/pm "+user+","+JSON.stringify({updateDiv : divid, updateValue : value, updated: 'no'}));
 	}
 
 	function updateList(value, id, dataList, divid) {

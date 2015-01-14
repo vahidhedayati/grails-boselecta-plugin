@@ -3,7 +3,7 @@ Bo selecta!
 
 Grails plugin that uses default WebSocket technology to interact with your domainClasses and produce dependent form / options that depend on one another. The format to define select functionality / auto complete are identical. Auto complete requires additional boolean values to be passed to make it auto complete.
 
-The information that appears on your front end web page is passed via a socket connection that is activated initially, so only selected items and their dependent lists are ever loaded at any one time.
+The information that appears on your front end web page is passed via websockets, with your page being the front-end connection receving JSON results. The DOM object will only contain selected items and their dependent selected lists at any one time.
 
 This is a secure way of interacting with any of your given domainClasses that have a hasMany/belongsTo(full / loose) dependencies supported. 
 
@@ -30,8 +30,11 @@ Class a {
  
  
     
-When selections are made the backend initially keeps a map of user definitions per call/job. When a request comes in, the format is this is my divId the value is this this is my job and username...
-The backend then finds the relevant map that has the domain details for this call and passes the value to process. It then returns the full dependent result set as JSON through websockets (this being the backend user connected via the ClientProcess.groovy). To the front end webpage user. The webpage user picks up JSON result set and ammends either the select or dataList options list relevant div ID.
+When selections are made the backend initially keeps a map of user definitions per call/job. When a request comes in, the format is this is my divId and this is my current selected value.
+
+The backend then finds the relevant map that has the domain details for this call and passes the value to process. 
+
+It then returns the full dependent result set as JSON through websockets (this being the backend user connected via the ClientProcess.groovy). To the front end webpage user. The webpage user picks up JSON result set and ammends either the select or dataList options list relevant divId.
 
 This is a result of security issues faced by many who used [ajaxdependancyselection plugin](https://github.com/vahidhedayati/ajaxdependancyselection). 
 

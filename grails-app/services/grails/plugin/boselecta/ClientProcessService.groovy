@@ -15,18 +15,20 @@ public class ClientProcessService extends ConfService implements ClientSessions 
 
 	public void processResponse(Session userSession, String message) {
 		String username = userSession.userProperties.get("username") as String
+		String userJob = userSession.userProperties.get("job") as String
+		
 		boolean disco = true
 		if (message.startsWith("/pm")) {
 			def values = parseInput("/pm ",message)
 			String user = values.user as String
 			String msg = values.msg as String
 			if (user == username) {
-				checkMessage(userSession, username, msg)
+				checkMessage(userSession, userJob, username, msg)
 			}
 		}else if (message.startsWith('{')) {
 			JSONObject rmesg=JSON.parse(message)
 
-			checkMessage(userSession, username, rmesg)
+			checkMessage(userSession, userJob, username, rmesg)
 
 			String actionthis=''
 			String msgFrom = rmesg.msgFrom
@@ -35,7 +37,7 @@ public class ClientProcessService extends ConfService implements ClientSessions 
 			String disconnect = rmesg.system
 			if (rmesg.privateMessage) {
 				JSONObject rmesg2=JSON.parse(rmesg.privateMessage)
-				checkMessage(userSession, username, rmesg2)
+				checkMessage(userSession, userJob, username, rmesg2)
 				String command = rmesg2.command
 			}
 			if (disconnect && disconnect == "disconnect") {
@@ -76,7 +78,7 @@ public class ClientProcessService extends ConfService implements ClientSessions 
 		}
 	}
 
-	def checkMessage(Session userSession, String username, JSONObject rmesg) {
+	def checkMessage(Session userSession, String userJob, String username, JSONObject rmesg) {
 
 		// Initial connection
 		String secondary = rmesg.secondary
@@ -94,7 +96,7 @@ public class ClientProcessService extends ConfService implements ClientSessions 
 		String bindId = rmesg.bindId
 		String appendValue = rmesg.appendValue ?: ''
 		String appendName = rmesg.appendName ?: ''
-		String jobName = rmesg.job
+		//String jobName = rmesg.job
 
 		// Related to auto complete - initial map
 		String order = rmesg.order ?: 'DESC'
@@ -103,7 +105,7 @@ public class ClientProcessService extends ConfService implements ClientSessions 
 
 
 		//Return via Javascript upon click
-		String cjobName = rmesg.cjobName
+		//String cjobName = rmesg.cjobName
 		String updateValue = rmesg.updateValue
 		String updateDiv = rmesg.updateDiv
 		String updated = rmesg.updated ?: 'yes'
@@ -124,7 +126,7 @@ public class ClientProcessService extends ConfService implements ClientSessions 
 
 			Set<HashMap<String,String>> storedMap = ([] as Set).asSynchronized()
 
-			def myMap = [jobName: jobName, setId: setId,  secondary: secondary,collectfield:collectfield, searchField:searchField, bindId:bindId,
+			def myMap = [jobName: userJob, jobUser:username,  setId: setId,  secondary: secondary,collectfield:collectfield, searchField:searchField, bindId:bindId,
 				appendValue:appendValue, primary:primary, appendName:appendName, nextValue:nextValue, formatting:formatting, order: order,
 				max:max, dataList:dataList, sDataList:sDataList, primaryCollect:primaryCollect, primarySearch: primarySearch]
 
@@ -163,7 +165,7 @@ public class ClientProcessService extends ConfService implements ClientSessions 
 				boolean go = false
 				myMaper.each { s ->
 					go = false
-					if (s.setId == updateDiv) {
+					if ((s.setId == updateDiv)&&(userJob==s.jobName)&&(s.jobUser==parseFrontEnd(username)))  {
 						go = true
 						secondary = s.secondary
 						collectfield = s.collectfield
@@ -255,6 +257,13 @@ public class ClientProcessService extends ConfService implements ClientSessions 
 			}
 
 		}
+	}
+	
+	private String parseFrontEnd(String username) {
+		if (username.endsWith(frontend)) { 
+			username=username.substring(0, username.indexOf(frontend))
+		}
+		return username
 	}
 
 	private String mapValue(Map s, String search) {
