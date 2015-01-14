@@ -64,15 +64,14 @@ class BoSelectaEndpoint  implements ServletContextListener, UserSessions {
 	@OnOpen
 	public void handleOpen(Session userSession,EndpointConfig c,@PathParam("job") String job) {
 		jobUsers.add(userSession)
-
-		userSession.userProperties.put("job", job)
+		
 		def ctx= SCH.servletContext.getAttribute(GA.APPLICATION_CONTEXT)
 		def grailsApplication = ctx.grailsApplication
 		config = grailsApplication.config.boselecta
 		authService = ctx.authService
 		messagingService = ctx.messagingService
 
-		
+		userSession.userProperties.put("job", job)
 		
 	}
 

@@ -18,7 +18,6 @@ class AuthService extends ConfService implements UserSessions  {
 		def username = message.substring(message.indexOf(connector)+connector.length(),message.length()).trim().replace(' ', '_').replace('.', '_')
 		if (loggedIn(username)==false) {
 			userSession.userProperties.put("username", username)
-			def myMsg2 = [:]
 		}else{
 			myMsg.put("message", "${username} is already loggged in elsewhere, action denied")
 		}

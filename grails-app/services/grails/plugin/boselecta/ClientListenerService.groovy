@@ -131,13 +131,11 @@ public class ClientListenerService extends ConfService implements UserSessions, 
 	}
 */
 
-	Session p_connect(String _uri, String _username, String _room){
-		String oRoom = _room ?: config.room
+	Session p_connect(String _uri, String _username, String room){
 		URI oUri
 		if(_uri){
-			oUri = URI.create(_uri+oRoom);
+			oUri = URI.create(_uri+room);
 		}
-
 		def container = ContainerProvider.getWebSocketContainer()
 		Session oSession
 		try{

@@ -15,7 +15,7 @@ public class ClientProcessService extends ConfService implements ClientSessions 
 
 	public void processResponse(Session userSession, String message) {
 		String username = userSession.userProperties.get("username") as String
-		String userJob = userSession.userProperties.get("job") as String
+		
 		
 		boolean disco = true
 		if (message.startsWith("/pm")) {
@@ -23,12 +23,12 @@ public class ClientProcessService extends ConfService implements ClientSessions 
 			String user = values.user as String
 			String msg = values.msg as String
 			if (user == username) {
-				checkMessage(userSession, userJob, username, msg)
+				checkMessage(userSession, username, msg)
 			}
 		}else if (message.startsWith('{')) {
 			JSONObject rmesg=JSON.parse(message)
 
-			checkMessage(userSession, userJob, username, rmesg)
+			checkMessage(userSession, username, rmesg)
 
 			String actionthis=''
 			String msgFrom = rmesg.msgFrom
@@ -37,7 +37,7 @@ public class ClientProcessService extends ConfService implements ClientSessions 
 			String disconnect = rmesg.system
 			if (rmesg.privateMessage) {
 				JSONObject rmesg2=JSON.parse(rmesg.privateMessage)
-				checkMessage(userSession, userJob, username, rmesg2)
+				checkMessage(userSession, username, rmesg2)
 				String command = rmesg2.command
 			}
 			if (disconnect && disconnect == "disconnect") {
@@ -78,7 +78,7 @@ public class ClientProcessService extends ConfService implements ClientSessions 
 		}
 	}
 
-	def checkMessage(Session userSession, String userJob, String username, JSONObject rmesg) {
+	def checkMessage(Session userSession, String username, JSONObject rmesg) {
 
 		// Initial connection
 		String secondary = rmesg.secondary
@@ -125,8 +125,9 @@ public class ClientProcessService extends ConfService implements ClientSessions 
 		if (setId) {
 
 			Set<HashMap<String,String>> storedMap = ([] as Set).asSynchronized()
+			//Set<HashMap<String,String>> storedMap= Collections.synchronizedSet(new HashSet<HashMap<String,String>>())
 
-			def myMap = [jobName: userJob, jobUser:username,  setId: setId,  secondary: secondary,collectfield:collectfield, searchField:searchField, bindId:bindId,
+			def myMap = [jobUser:username,  setId: setId,  secondary: secondary,collectfield:collectfield, searchField:searchField, bindId:bindId,
 				appendValue:appendValue, primary:primary, appendName:appendName, nextValue:nextValue, formatting:formatting, order: order,
 				max:max, dataList:dataList, sDataList:sDataList, primaryCollect:primaryCollect, primarySearch: primarySearch]
 
@@ -165,7 +166,7 @@ public class ClientProcessService extends ConfService implements ClientSessions 
 				boolean go = false
 				myMaper.each { s ->
 					go = false
-					if ((s.setId == updateDiv)&&(userJob==s.jobName)&&(s.jobUser==parseFrontEnd(username)))  {
+					if ((s.setId == updateDiv)&&(s.jobUser==parseFrontEnd(username)))  {
 						go = true
 						secondary = s.secondary
 						collectfield = s.collectfield
