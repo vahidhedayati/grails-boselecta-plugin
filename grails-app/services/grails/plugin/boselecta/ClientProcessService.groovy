@@ -121,13 +121,12 @@ public class ClientProcessService extends ConfService implements ClientSessions 
 		boolean autoCompletePrimary = rmesg?.autoCompletePrimary?.toBoolean() ?: false
 
 		if (setId) {
-			Set<HashMap<String,String>> storedMap1= Collections.synchronizedSet(new HashSet<HashMap<String,String>>())
 
-			def myMap = [
-				jobName: jobName, setId: setId,  secondary: secondary,collectfield:collectfield,
-				searchField:searchField, bindId:bindId, appendValue:appendValue, primary:primary,
-				appendName:appendName, nextValue:nextValue, formatting:formatting, order: order, max:max,
-				dataList:dataList, sDataList:sDataList, primaryCollect:primaryCollect, primarySearch: primarySearch		]
+			Set<HashMap<String,String>> storedMap = ([] as Set).asSynchronized()
+
+			def myMap = [jobName: jobName, setId: setId,  secondary: secondary,collectfield:collectfield, searchField:searchField, bindId:bindId,
+				appendValue:appendValue, primary:primary, appendName:appendName, nextValue:nextValue, formatting:formatting, order: order,
+				max:max, dataList:dataList, sDataList:sDataList, primaryCollect:primaryCollect, primarySearch: primarySearch]
 
 
 			for (int a=3; a < depth; a++ ) {
@@ -137,23 +136,26 @@ public class ClientProcessService extends ConfService implements ClientSessions 
 			}
 
 			def myMaper = userSession.userProperties.get("currentMap")
-			storedMap1.add(myMap)
+			storedMap.add(myMap)
 			if (myMaper) {
 				myMaper.each { ss->
-					storedMap1.add(ss)
+					storedMap.add(ss)
 				}
 			}
 
-			userSession.userProperties.put("currentMap", storedMap1)
+			userSession.userProperties.put("currentMap", storedMap)
 
 			if (autoCompletePrimary) {
 				def result = autoCompleteService.returnAutoList(primary, primarySearch, primaryCollect)
-				Map mresult = [ autoResult: result,updateThisDiv: cId, appendName: appendName, appendName: appendName,
-					nextValue:nextValue,updated:updated, updateValue:updateValue, formatting:formatting, cId:cId,
-					updateList:dataList, updateAutoValue:updateAutoValue]
+
+				Map mresult = [autoResult: result,updateThisDiv: cId, appendName: appendName, appendName: appendName, nextValue:nextValue,
+					updated:updated, updateValue:updateValue, formatting:formatting, cId:cId, updateList:dataList, updateAutoValue:updateAutoValue]
+
 				sleep(2000)
+
 				clientListenerService.sendFrontEndPM(userSession, username,(mresult as JSON).toString())
 			}
+
 		}else if (updateValue) {
 			def myMaper = userSession.userProperties.get("currentMap")
 			Map currentSelection = [:]
@@ -174,7 +176,6 @@ public class ClientProcessService extends ConfService implements ClientSessions 
 						primary = s.primary
 						dataList = s.dataList
 						sDataList = s.DataList
-
 					}
 					if (go) {
 
@@ -184,22 +185,22 @@ public class ClientProcessService extends ConfService implements ClientSessions 
 						}else{
 							result = autoCompleteService.selectNoRefDomainClass(primary, secondary, collectfield, searchField, bindId, updateValue )
 						}
-						Map mresult = [ result: result,updateThisDiv: updateDiv, appendName: appendName, appendName: appendName,
+						Map mresult = [result: result,updateThisDiv: updateDiv, appendName: appendName, appendName: appendName,
 							nextValue:nextValue,updated:updated, updateValue:updateValue, formatting:formatting, cId:cId]
 
 						for (int a=3; a < depth; a++ ) {
-							if (mapValue( s, "domain${a}")) {
+							if (mapValue(s, "domain${a}")) {
 								def res
-								if (mapValue( s, "bindId${a}").endsWith('.id')) {
-									res = autoCompleteService.selectDomainClass(mapValue( s, "domain${a}"), mapValue( s, "collectfield${a}"),
-											mapValue( s, "searchField${a}"), mapValue( s, "bindId${a}"), updateValue )
+								if (mapValue(s, "bindId${a}").endsWith('.id')) {
+									res = autoCompleteService.selectDomainClass(mapValue(s, "domain${a}"), mapValue(s, "collectfield${a}"),
+											mapValue(s, "searchField${a}"), mapValue(s, "bindId${a}"), updateValue )
 								}else{
-									res = autoCompleteService.selectNoRefDomainClass(primary,  mapValue( s, "domain${a}"), mapValue( s, "collectfield${a}"),
-											mapValue( s, "searchField${a}"), mapValue( s, "bindId${a}"), updateValue  )
+									res = autoCompleteService.selectNoRefDomainClass(primary,  mapValue(s, "domain${a}"), mapValue(s, "collectfield${a}"),
+											mapValue(s, "searchField${a}"), mapValue(s, "bindId${a}"), updateValue  )
 								}
 								if (res) {
 									mresult.put("result${a}", res)
-									mresult.put("setId${a}", mapValue( s, "setId${a}"))
+									mresult.put("setId${a}", mapValue(s, "setId${a}"))
 								}
 							}
 						}
@@ -236,16 +237,17 @@ public class ClientProcessService extends ConfService implements ClientSessions 
 						primarySearch = s.primarySearch
 					}
 					if (go) {
-						//def res = autoCompleteService.selectDomainClass(secondary,  searchField,  collectfield, bindId, updateAutoValue)
 						def res
 						if (bindId.endsWith('.id')) {
 							res = autoCompleteService.selectDomainClass(secondary,  searchField,  collectfield, bindId, updateAutoValue)
 						}else{
 							res = autoCompleteService.selectNoRefDomainClass(primary, secondary, collectfield, searchField, bindId)
 						}
-						
-						Map mresult = [autoResult: res,  setId: setId, updateThisDiv: updateDiv, cId: cId,  appendName: appendName, appendName: appendName,
-							nextValue:nextValue,updated:updated, updateValue:updateValue, formatting:formatting, updateList:updateList]
+
+						Map mresult = [autoResult: res,  setId: setId, updateThisDiv: updateDiv, cId: cId,  appendName: appendName,
+							appendName: appendName, nextValue:nextValue,updated:updated, updateValue:updateValue, formatting:formatting,
+							updateList:updateList]
+
 						clientListenerService.sendFrontEndPM(userSession, username,(mresult as JSON).toString())
 
 					}
