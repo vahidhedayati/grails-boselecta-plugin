@@ -130,6 +130,9 @@ function updateOtherView(jsonResult,cid, updateValue,format) {
 			if (entry.name != null) {
 				name=entry.name;
 			}
+			if (entry.resarray != null) {
+				resarray=entry.resarray;
+			}
 			
 			
 			if (format == "JSON") {
@@ -162,12 +165,13 @@ function updateAutoView(jsonResult, cId, setId, appendName, appendValue, updated
     }
 	jsonResult.forEach(function(item) {
         var option = document.createElement('option');
-        option.value = item.id;
+        
+        option.label = item.name;
         if (format == "JSON") {
-				option.label = JSON.stringify(item.resarray);
-		}else{
-				option.label = item.name;
+				//option.value = JSON.stringify(item.resarray);
+				option.id = JSON.stringify(item.resarray);
 		}
+		option.value = item.id;		
 			
         dataList.appendChild(option);
     });

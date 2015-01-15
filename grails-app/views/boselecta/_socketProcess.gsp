@@ -18,6 +18,7 @@
 		//var dataList = document.getElementById(dataList);
 		//var x = input.value;
         //var val = $(dataList).find('option[value="' + x + '"]');
+        // all dataList elements now store JSON results in id attribute.
         //var endval = val.attr('id');
  	//}
 

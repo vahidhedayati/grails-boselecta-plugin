@@ -18,8 +18,8 @@ class BoSelectaTagLib extends ConfService implements ClientSessions {
 		if (user) {
 			out << randService.randomise(user)
 		}
-	} 
-	
+	}
+
 	def connect  =  { attrs ->
 		def job = attrs.remove('job')?.toString()
 		def actionMap = attrs.remove('actionMap')
@@ -81,13 +81,13 @@ class BoSelectaTagLib extends ConfService implements ClientSessions {
 
 		// Reset the map - now held in userSession no need
 		//clientListenerService.truncateStoredMap(oSession , job)
-		
+
 		Map model = [  message : message, job: job, hostname: hostname, actionMap: actionMap,
 			appName: appName, frontuser:frontuser,  user: user,  receivers: receivers, divId: divId,
 			chatApp: APP, addAppName: addAppName ]
-		
+
 		loadTemplate(attrs,'socketConnect', model)
-		
+
 		if (sendType == 'message') {
 			if (receivers) {
 				clientListenerService.sendArrayPM(oSession, job, message)
@@ -99,7 +99,7 @@ class BoSelectaTagLib extends ConfService implements ClientSessions {
 		if (autodisco) {
 			clientListenerService.disconnect(oSession)
 		}
-		
+
 		Map map2 = [job: job]
 		loadTemplate(attrs,'socketProcess', map2)
 	}
@@ -124,21 +124,21 @@ class BoSelectaTagLib extends ConfService implements ClientSessions {
 		String value = attrs.remove('value')?.toString()
 		String nextValue = attrs.remove('nextValue')?.toString()
 		String placeHolder = attrs.remove('placeHolder')?.toString()
-		
+
 		String max = attrs.remove('max')?.toString()
 		String order = attrs.remove('order')?.toString()
-		
-		
+
+
 		boolean norefPrimary = attrs.remove('norefPrimary')?.toBoolean() ?: false
 		boolean autoComplete = attrs.remove('autoComplete')?.toBoolean() ?: false
 		boolean autoCompletePrimary = attrs.remove('autoCompletePrimary')?.toBoolean() ?: false
-		
+
 		boolean selectToAutoComplete = attrs.remove('selectToAutoComplete')?.toBoolean() ?: false
 		boolean autoCompleteToSelect = attrs.remove('autoCompleteToSelect')?.toBoolean() ?: false
-		
-		
+
+
 		// Format can be set as JSON
-		String formatting = attrs.remove('formatting').toString() ?: config.formatting ?: 'none'
+		String formatting = attrs.remove('formatting')?.toString() ?: config.formatting ?: 'none'
 
 		boolean require = attrs.remove('require')?.toBoolean() ?: false
 
@@ -150,12 +150,12 @@ class BoSelectaTagLib extends ConfService implements ClientSessions {
 		if (!searchField2) {
 			throwTagError("Tag [multiSelect] is missing required attribute [searchField]")
 		}
-		
+
 		collectField2 = collectField2 ?: collectField
 		if (!collectField2) {
 			collectField2 = searchField2
 		}
-		
+
 		if (!collectField) {
 			collectField=collectField2
 		}
@@ -185,40 +185,48 @@ class BoSelectaTagLib extends ConfService implements ClientSessions {
 			requireField=require
 		}
 		List primarylist = []
-
+		boolean loadPrimary = false
 		if ((domain) && (bindid && (bindid.endsWith('.id'))||(norefPrimary))) {
-			//primarylist = autoCompleteService.returnPrimaryList(domain, searchField, collectField)
-			primarylist = autoCompleteService.returnPrimaryList(domain)
+			loadPrimary = true
+			if (formatting == "JSON") {
+				primarylist = autoCompleteService.returnPrimaryList(domain, searchField, collectField)
+			}else{
+				primarylist = autoCompleteService.returnPrimaryList(domain)
+			}
 		}
-		
+
 		def multiDomainMap
-		
+
 		String dataList = "${id}-datalist"
 		String sDataList = "${setId}-datalist"
-		
+
 		// AutoComplete box
 		if (autoComplete) {
 			Map map = [value: value, setId:setId, user:user, job:job, name:name, dataList:dataList, searchField:searchField,
 				collectField: collectField, id:id, placeHolder:placeHolder, sDataList:sDataList, autoCompleteToSelect:autoCompleteToSelect]
 			loadTemplate(attrs,'genAutoComplete', map)
 		}
-		
+
 		// Select Box
 		else{
-			
+
 			def gsattrs=[optionKey: collectField , optionValue: searchField, id: id, value: value, name: name]
 
 			gsattrs['noSelection'] = attrs.noSelection
-			gsattrs['from'] = primarylist
+			gsattrs['from'] = []
+			if (loadPrimary && (formatting != "JSON")) {
+				gsattrs['from'] = primarylist
+			}
+
 
 			if (requireField) {
 				gsattrs['required'] = 'required'
 			}
 
-			
-			if (selectToAutoComplete) { 
+
+			if (selectToAutoComplete) {
 				gsattrs['onchange'] = "javascript:updateList(this.value, '${id}',  '${sDataList}', '${setId}');"
-				
+
 			}else{
 				// 	Front End JAVA Script actioned by socketProcess gsp template
 				//gsattrs['onchange'] = "javascript:actionThis(this.value, '${setId}', '${user}', '${job}');"
@@ -231,12 +239,12 @@ class BoSelectaTagLib extends ConfService implements ClientSessions {
 
 			out << g.select(gsattrs)
 		}
-		
 
-		// Generate Message which is initial map containing default containing 
+
+		// Generate Message which is initial map containing default containing
 		// result set that then needs to be appended
-		def message = [setId: setId, secondary: domain2, primaryCollect: collectField, collectfield: collectField2,	primarySearch: searchField, 
-			searchField:  searchField2, appendValue: appendValue, appendName: appendName, job:job, formatting:formatting, nextValue:nextValue, 
+		def message = [setId: setId, secondary: domain2, primaryCollect: collectField, collectfield: collectField2,	primarySearch: searchField,
+			searchField:  searchField2, appendValue: appendValue, appendName: appendName, job:job, formatting:formatting, nextValue:nextValue,
 			primary: domain, max:max, order:order, cId: id,	autoCompletePrimary:autoCompletePrimary, dataList:dataList, sDataList:sDataList]
 
 		if (bindid) {
@@ -249,24 +257,29 @@ class BoSelectaTagLib extends ConfService implements ClientSessions {
 
 		def cc=message as JSON
 		clientListenerService.sendJobMessage(job, cc as String)
-		
+
 		if (value||nextValue) {
 			Map map = [value: value, setId:setId, user:user, job:job]
 			loadTemplate(attrs,'actionNonAppendThis', map)
+
+		}
+		if (loadPrimary && (formatting == "JSON")) {
+			Map jsonMap = [primarylist: primarylist, id:id, formatting: formatting, updateValue:value]
+			loadTemplate(attrs,'primaryJSONParser', [message: jsonMap as JSON])
 		}
 	}
-	
 
-	 // Moved to gsp templates - so that you can override given template name
-	 private void loadTemplate(attrs, String template, Map myMap) {
-		 def userTemplate = attrs."${template}" ?: config."${template}"
-		 def defaultTemplate = "/${VIEW}/${template}"
-		 if (userTemplate) {
-			 out << g.render(template:userTemplate, model: myMap)
-		 }else{
-			 out << g.render(contextPath: pluginContextPath, template: defaultTemplate, model: myMap)
-		 }
-	 }
+
+	// Moved to gsp templates - so that you can override given template name
+	private void loadTemplate(attrs, String template, Map myMap) {
+		def userTemplate = attrs."${template}" ?: config."${template}"
+		def defaultTemplate = "/${VIEW}/${template}"
+		if (userTemplate) {
+			out << g.render(template:userTemplate, model: myMap)
+		}else{
+			out << g.render(contextPath: pluginContextPath, template: defaultTemplate, model: myMap)
+		}
+	}
 
 	private Map createDomainMap(attrs) {
 		int a=3
