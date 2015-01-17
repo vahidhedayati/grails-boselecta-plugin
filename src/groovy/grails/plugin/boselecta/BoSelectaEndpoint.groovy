@@ -109,7 +109,6 @@ class BoSelectaEndpoint  implements ServletContextListener, UserSessions {
 			if (message.startsWith(connector)) {
 				authService.connectUser(message,userSession,job)
 			}
-
 		}else{
 			if (message.startsWith("DISCO:-")) {
 				jobUsers.remove(userSession)
@@ -130,10 +129,6 @@ class BoSelectaEndpoint  implements ServletContextListener, UserSessions {
 					myMsg.put("message","Private message self?")
 					messagingService.messageUser(userSession,myMsg)
 				}
-			}else{
-
-				myMsg.put("message", "${message}")
-				messagingService.broadcast(userSession,myMsg)
 			}
 		}
 	}

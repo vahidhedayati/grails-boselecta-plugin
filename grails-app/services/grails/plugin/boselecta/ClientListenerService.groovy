@@ -59,14 +59,37 @@ public class ClientListenerService extends ConfService implements UserSessions, 
 		}
 	}
 
-	
+
 	def sendFrontEndPM(Session userSession, String user,String message) {
-		
 		def found=findUser(user+frontend)
+		// Fixed - private messaging from backend to front-end
+		// messages were getting sent to all before.
 		userSession.basicRemote.sendText("/pm ${user+frontend},${message}")
-		// TODO
-		// Should work with above call  - take a look at this
-		userSession.basicRemote.sendText("${message}")
+
+	}
+
+	// Added backend PM - new connection info was being relayed to all before.
+	def sendBackPM(String user,String message) {
+		if (user.endsWith(frontend)) {
+			user=user.substring(0,user.indexOf(frontend))
+		}
+		try {
+			synchronized (jobUsers) {
+				jobUsers?.each { crec->
+					if (crec && crec.isOpen()) {
+						String cuser = crec.userProperties.get("username") as String
+						String cjob =  crec.userProperties.get("job") as String
+						boolean found = false
+						if (user==cuser) {
+							crec.basicRemote.sendText("${message}")
+						}
+					}
+				}
+			}
+
+		} catch (IOException e) {
+			log.error ("onMessage failed", e)
+		}
 	}
 
 	def sendBackEndPM(Session userSession, String user,String message) {
@@ -115,21 +138,6 @@ public class ClientListenerService extends ConfService implements UserSessions, 
 	public void sendMessage(Session userSession,final String message) {
 		userSession.basicRemote.sendText(message)
 	}
-
-/*
-	public void truncateStoredMap(Session userSession, String job) {
-		def myMaper = userSession.userProperties.get("currentMap")
-		Set<HashMap<String,String>> storedMap1= Collections.synchronizedSet(new HashSet<HashMap<String,String>>())
-		if (myMaper) {
-			myMaper.each { ss->
-				//if (ss.jobName!=job) {
-				//	storedMap1.add(ss)
-				//}
-			}
-		}
-		userSession.userProperties.put("currentMap", storedMap1)
-	}
-*/
 
 	Session p_connect(String _uri, String _username, String room){
 		URI oUri

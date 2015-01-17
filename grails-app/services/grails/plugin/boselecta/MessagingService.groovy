@@ -12,8 +12,6 @@ class MessagingService extends ConfService  implements UserSessions {
 
 
 	def sendMsg(Session userSession,String msg) {
-		String urecord = userSession.userProperties.get("username") as String
-
 		try {
 			userSession.basicRemote.sendText(msg)
 		} catch (IOException e) {
@@ -24,9 +22,8 @@ class MessagingService extends ConfService  implements UserSessions {
 		def myMsgj = (msg as JSON).toString()
 		sendMsg(userSession, myMsgj)
 	}
-	
+
 	def privateMessage(Session userSession,String user,String msg) {
-		def myMsg = [:]
 		String urecord = userSession.userProperties.get("username") as String
 		Boolean found = false
 		try {
@@ -36,9 +33,11 @@ class MessagingService extends ConfService  implements UserSessions {
 						def cuser = crec.userProperties.get("username").toString()
 						if (cuser.equals(user)) {
 							found = true
-							crec.basicRemote.sendText(msg as String)
-							myMsg.put("message","--> PM sent to ${user}")
-							messageUser(userSession,myMsg)
+							if (cuser.endsWith(frontend)) {
+								messageUser(crec,["message": "${msg}"])
+							}else{
+								crec.basicRemote.sendText(msg as String)
+							}
 						}
 					}
 				}
@@ -47,24 +46,5 @@ class MessagingService extends ConfService  implements UserSessions {
 			log.error ("onMessage failed", e)
 		}
 	}
-
-
-	def broadcast(Session userSession,Map msg) {
-		def myMsgj = msg as JSON
-		String room = userSession.userProperties.get("room") as String
-		String urecord = userSession.userProperties.get("username") as String
-		try {
-			synchronized (jobUsers) {
-				jobUsers?.each { crec->
-					if (crec && crec.isOpen() && room.equals(crec.userProperties.get("room"))) {
-						crec.basicRemote.sendText(myMsgj as String);
-					}
-				}
-			}
-		} catch (IOException e) {
-			log.error ("onMessage failed", e)
-		}
-	}
-
 
 }

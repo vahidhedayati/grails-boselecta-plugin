@@ -29,7 +29,6 @@ class ConfService {
 		}
 	}
 
-	
 	public Map<String, String> parseInput(String mtype,String message){
 		def p1 = mtype
 		def mu = message.substring(p1.length(),message.length())

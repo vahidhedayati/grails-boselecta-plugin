@@ -209,6 +209,7 @@ function updateView(jsonResult, setId, appendName, appendValue, updated, updateV
 		if (entry1.name!=null) {
 			name = entry1.name;
 		}
+		console.log()
 		if (format == "JSON") {
 				opt.value = JSON.stringify(resarray);
 			}else{

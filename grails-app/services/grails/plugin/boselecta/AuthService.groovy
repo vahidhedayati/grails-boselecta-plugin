@@ -22,7 +22,7 @@ class AuthService extends ConfService implements UserSessions  {
 			myMsg.put("message", "${username} is already loggged in elsewhere, action denied")
 		}
 		if (myMsg) {
-			messagingService.broadcast(userSession,myMsg)
+			messagingService.messageUser(userSession,myMsg)
 		}
 	}
 

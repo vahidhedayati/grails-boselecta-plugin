@@ -15,8 +15,6 @@ public class ClientProcessService extends ConfService implements ClientSessions 
 
 	public void processResponse(Session userSession, String message) {
 		String username = userSession.userProperties.get("username") as String
-		
-		
 		boolean disco = true
 		if (message.startsWith("/pm")) {
 			def values = parseInput("/pm ",message)
@@ -79,7 +77,6 @@ public class ClientProcessService extends ConfService implements ClientSessions 
 	}
 
 	def checkMessage(Session userSession, String username, JSONObject rmesg) {
-
 		// Initial connection
 		String secondary = rmesg.secondary
 		String primary = rmesg.primary
@@ -217,6 +214,7 @@ public class ClientProcessService extends ConfService implements ClientSessions 
 			Map currentSelection = [:]
 			if (myMaper) {
 				boolean go = false
+				
 				myMaper.each { s ->
 					go = false
 					if (s.setId == updateDiv) {
@@ -239,12 +237,14 @@ public class ClientProcessService extends ConfService implements ClientSessions 
 						primaryCollect = s.primaryCollect
 						primarySearch = s.primarySearch
 					}
-					if (go) {
+					if (go && secondary) {
 						def res
 						if (bindId.endsWith('.id')) {
 							res = autoCompleteService.selectDomainClass(secondary,  searchField,  collectfield, bindId, updateAutoValue)
 						}else{
-							res = autoCompleteService.selectNoRefDomainClass(primary, secondary, collectfield, searchField, bindId)
+							if (primary && primary != 'null') {
+								res = autoCompleteService.selectNoRefDomainClass(primary, secondary, collectfield, searchField, bindId)
+							}
 						}
 
 						Map mresult = [autoResult: res,  setId: setId, updateThisDiv: updateDiv, cId: cId,  appendName: appendName,
@@ -259,9 +259,9 @@ public class ClientProcessService extends ConfService implements ClientSessions 
 
 		}
 	}
-	
+
 	private String parseFrontEnd(String username) {
-		if (username.endsWith(frontend)) { 
+		if (username.endsWith(frontend)) {
 			username=username.substring(0, username.indexOf(frontend))
 		}
 		return username

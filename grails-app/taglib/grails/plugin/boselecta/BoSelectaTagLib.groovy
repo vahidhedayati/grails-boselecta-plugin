@@ -32,7 +32,6 @@ class BoSelectaTagLib extends ConfService implements ClientSessions {
 		String hostname = attrs.remove('hostname')?.toString()
 		String appName = attrs.remove('appName')?.toString()
 		String user = attrs.remove('user')?.toString()
-		String message = attrs.remove('message')?.toString()
 		String divId = attrs.remove('divId')?.toString() ?: ''
 		String sendType = attrs.remove('sendType')?.toString() ?: 'message'
 		String event =  attrs.remove('event')?.toString()
@@ -79,22 +78,12 @@ class BoSelectaTagLib extends ConfService implements ClientSessions {
 		// Make a socket connection as actual main user (backend connection)
 		Session oSession = clientListenerService.p_connect(uri, user, job)
 
-		// Reset the map - now held in userSession no need
-		//clientListenerService.truncateStoredMap(oSession , job)
-
-		Map model = [  message : message, job: job, hostname: hostname, actionMap: actionMap,
+		Map model = [   job: job, hostname: hostname, actionMap: actionMap,
 			appName: appName, frontuser:frontuser,  user: user,  receivers: receivers, divId: divId,
 			chatApp: APP, addAppName: addAppName ]
 
 		loadTemplate(attrs,'socketConnect', model)
 
-		if (sendType == 'message') {
-			if (receivers) {
-				clientListenerService.sendArrayPM(oSession, job, message)
-			}else{
-				clientListenerService.sendMessage( oSession,  message)
-			}
-		}
 
 		if (autodisco) {
 			clientListenerService.disconnect(oSession)
@@ -256,7 +245,7 @@ class BoSelectaTagLib extends ConfService implements ClientSessions {
 		}
 
 		def cc=message as JSON
-		clientListenerService.sendJobMessage(job, cc as String)
+		clientListenerService.sendBackPM(user, cc as String)
 
 		if (value||nextValue) {
 			Map map = [value: value, setId:setId, user:user, job:job]
