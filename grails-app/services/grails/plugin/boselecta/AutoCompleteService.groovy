@@ -12,23 +12,24 @@ class AutoCompleteService {
 	def grailsApplication
 
 	// No reference selection method i.e. belongsTo=UpperClass
+	//@Transactional
 	ArrayList selectNoRefDomainClass(String domainClaz, String domainClaz2, String searchField, String collectField, String bindName, String recordId) {
 		def primarySelectList = []
 		if ((domainClaz2) && (domainClaz) &&( recordId)) {
 			def domainClass2 = grailsApplication?.getDomainClass(domainClaz2)?.clazz
 			def domainClass = grailsApplication?.getDomainClass(domainClaz)?.clazz
-			domainClass2.withTransaction {
-				def domaininq=domainClass?.get(parseRecord(recordId).toLong())
-				if (domaininq) {
-					domaininq."${bindName}".each { dq ->
-						def primaryMap = [:]
-						primaryMap.put('id',dq."${collectField}")
-						primaryMap.put('name', dq."${searchField}")
-						primaryMap.put('resarray', [selected: dq."${searchField}", selectedText:dq."${collectField}"])
-						primarySelectList.add(primaryMap)
-					}
+			//domainClass2.withTransaction {
+			def domaininq=domainClass?.get(parseRecord(recordId).toLong())
+			if (domaininq) {
+				domaininq."${bindName}".each { dq ->
+					def primaryMap = [:]
+					primaryMap.put('id',dq."${collectField}")
+					primaryMap.put('name', dq."${searchField}")
+					primaryMap.put('resarray', [selected: dq."${searchField}", selectedText:dq."${collectField}"])
+					primarySelectList.add(primaryMap)
 				}
 			}
+			//}
 		}
 		return primarySelectList
 	}
@@ -72,20 +73,20 @@ class AutoCompleteService {
 			clazz?.list()
 		}
 	}
-
+	//@Transactional
 	def returnAutoList(String className, String searchField, String collectField) {
 		def results
 		if (className) {
 			Class clazz = grailsApplication?.getDomainClass(className)?.clazz
-			clazz.withTransaction {
-				def res = clazz.findAll()
-				results = res?.collect {[	'id': it."${collectField}", 'name': it."${searchField}" ,
-						'resarray': [selected: it."${collectField}",  selectedText:it."${searchField}" ]]}?.unique()
-			}
+			//clazz.withTransaction {
+			def res = clazz.findAll()
+			results = res?.collect {[	'id': it."${collectField}", 'name': it."${searchField}" ,
+					'resarray': [selected: it."${collectField}",  selectedText:it."${searchField}" ]]}?.unique()
+			//}
 			return results
 		}
 	}
-	
+
 	private String parseRecord(String input) {
 		String cId = input
 		if (input.startsWith('{')) {
@@ -96,21 +97,21 @@ class AutoCompleteService {
 		}
 		return cId
 	}
-	
-	
-	 def returnPrimaryList(String className,String searchField, String collectField ) {
-	 def results
-	 if (className) {
-		 Class clazz = grailsApplication?.getDomainClass(className)?.clazz
-		 clazz.withTransaction {
-			 def res = clazz.findAll()
-			 results = res?.collect {[	'id': it."${collectField}", 'name': it."${searchField}" ,
-					 'resarray': [selected: it."${collectField}", selectedText: it."${searchField}" ]]}?.unique()
-		 }
-		 return results
-	 }
-	 }
- 
+
+	//@Transactional
+	def returnPrimaryList(String className,String searchField, String collectField ) {
+		def results
+		if (className) {
+			Class clazz = grailsApplication?.getDomainClass(className)?.clazz
+			//clazz.withTransaction {
+			def res = clazz.findAll()
+			results = res?.collect {[	'id': it."${collectField}", 'name': it."${searchField}" ,
+					'resarray': [selected: it."${collectField}", selectedText: it."${searchField}" ]]}?.unique()
+			//}
+			return results
+		}
+	}
+
 
 
 

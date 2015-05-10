@@ -26,14 +26,14 @@ import org.slf4j.LoggerFactory
 
 @WebListener
 @ServerEndpoint("/BoSelectaEndpoint/{job}")
-class BoSelectaEndpoint  implements ServletContextListener, UserSessions {
+class BoSelectaEndpoint  extends ConfService implements ServletContextListener {
 
 	private final Logger log = LoggerFactory.getLogger(getClass().name)
 
 	private ConfigObject config
 	private AuthService authService
 	private MessagingService messagingService
-	
+
 	@Override
 	public void contextInitialized(ServletContextEvent event) {
 		ServletContext servletContext = event.servletContext
@@ -63,16 +63,12 @@ class BoSelectaEndpoint  implements ServletContextListener, UserSessions {
 
 	@OnOpen
 	public void handleOpen(Session userSession,EndpointConfig c,@PathParam("job") String job) {
-		jobUsers.add(userSession)
-		
 		def ctx= SCH.servletContext.getAttribute(GA.APPLICATION_CONTEXT)
 		def grailsApplication = ctx.grailsApplication
 		config = grailsApplication.config.boselecta
 		authService = ctx.authService
 		messagingService = ctx.messagingService
-
 		userSession.userProperties.put("job", job)
-		
 	}
 
 
@@ -87,10 +83,9 @@ class BoSelectaEndpoint  implements ServletContextListener, UserSessions {
 
 	@OnClose
 	public void handeClose(Session userSession) throws SocketException {
-		try {
-			jobUsers.remove(userSession)
-		} catch(SocketException e) {
-			log.debug "Error $e"
+		String username = userSession?.userProperties?.get("username")
+		if (username) {
+			destroyJobUser(username)
 		}
 	}
 
@@ -111,11 +106,11 @@ class BoSelectaEndpoint  implements ServletContextListener, UserSessions {
 			}
 		}else{
 			if (message.startsWith("DISCO:-")) {
-				jobUsers.remove(userSession)
+				destroyJobUser(username)
 				userSession.close()
 				Session usersSess = findSession(username+frontend)
 				if (usersSess) {
-					jobUsers.remove(usersSess)
+					destroyJobUser(username+frontend)
 					usersSess.close()
 				}
 			}else if (message.startsWith("/pm")) {
@@ -133,44 +128,15 @@ class BoSelectaEndpoint  implements ServletContextListener, UserSessions {
 		}
 	}
 
-	private Map<String, JSONObject> parseInput(String mtype,String message){
-		def p1 = mtype
-		def mu = message.substring(p1.length(),message.length())
-		def msg
-		def user
-		def resultset = []
-		if (mu.indexOf(",")>-1) {
-			user = mu.substring(0,mu.indexOf(","))
-			msg = mu.substring(user.length()+1,mu.length())
-		}else{
-			user = mu.substring(0,mu.indexOf(" "))
-			msg = mu.substring(user.length()+1,mu.length())
-		}
-		Map<String, String> values  =  new HashMap<String, Double>();
-		values.put("user", user);
-		values.put("msg", msg);
-		return values
-	}
-
-	private String getFrontend() {
-		return config.frontenduser ?: '_frontend'
-	}
-	
 	private Session findSession(String username) {
 		Session userSession
-		try {
-			synchronized (jobUsers) {
-				jobUsers?.each { crec->
-					if (crec && crec.isOpen()) {
-						def cuser = crec.userProperties.get("username").toString()
-						if (cuser.equals(username)) {
-							userSession=crec
-						}
-					}
+		jobNames.each { String cuser, Session crec ->
+			if (crec && crec.isOpen()) {
+
+				if (cuser.equals(username)) {
+					userSession=crec
 				}
 			}
-		} catch (IOException e) {
-			log.error ("onMessage failed", e)
 		}
 		return userSession
 	}

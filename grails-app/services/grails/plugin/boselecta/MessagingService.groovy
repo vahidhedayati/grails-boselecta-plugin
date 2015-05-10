@@ -8,7 +8,7 @@ import javax.websocket.Session
 import org.codehaus.groovy.grails.web.json.JSONObject
 
 
-class MessagingService extends ConfService  implements UserSessions {
+class MessagingService extends ConfService  {
 
 
 	def sendMsg(Session userSession,String msg) {
@@ -26,25 +26,17 @@ class MessagingService extends ConfService  implements UserSessions {
 	def privateMessage(Session userSession,String user,String msg) {
 		String urecord = userSession.userProperties.get("username") as String
 		Boolean found = false
-		try {
-			synchronized (jobUsers) {
-				jobUsers?.each { crec->
-					if (crec && crec.isOpen()) {
-						def cuser = crec.userProperties.get("username").toString()
-						if (cuser.equals(user)) {
-							found = true
-							if (cuser.endsWith(frontend)) {
-								messageUser(crec,["message": "${msg}"])
-							}else{
-								crec.basicRemote.sendText(msg as String)
-							}
-						}
+		jobNames.each { String cuser, Session crec ->
+			if (crec && crec.isOpen()) {
+				if (cuser.equals(user)) {
+					found = true
+					if (cuser.endsWith(frontend)) {
+						messageUser(crec,["message": "${msg}"])
+					}else{
+						crec.basicRemote.sendText(msg as String)
 					}
 				}
 			}
-		} catch (IOException e) {
-			log.error ("onMessage failed", e)
 		}
 	}
-
 }

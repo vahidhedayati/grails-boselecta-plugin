@@ -8,55 +8,41 @@ import grails.plugin.boselecta.interfaces.UserSessions
 import javax.websocket.ContainerProvider
 import javax.websocket.Session
 
-public class ClientListenerService extends ConfService implements UserSessions, ClientSessions {
+public class ClientListenerService extends ConfService implements ClientSessions {
 
 
 	def sendArrayPM(Session userSession, String job,String message) {
-		try {
-			synchronized (jobUsers) {
-				jobUsers?.each { crec->
-					if (crec && crec.isOpen()) {
-						String cuser = crec.userProperties.get("username") as String
-						String cjob =  crec.userProperties.get("job") as String
-						boolean found = false
-						if (job==cjob) {
-							found=findUser(cuser)
-							if (found) {
-								crec.basicRemote.sendText("/pm ${cuser},${message}")
-							}
-							if (!cuser.toString().endsWith(frontend)) {
-								found=findUser(cuser+frontend)
-								if (found) {
-									crec.basicRemote.sendText("/pm ${cuser+frontend},${message}")
-								}
-							}
+		jobNames.each { String cuser, Session crec ->
+			if (crec && crec.isOpen()) {
+				String cjob =  crec.userProperties.get("job") as String
+				boolean found = false
+				if (job==cjob) {
+					found=findUser(cuser)
+					if (found) {
+						crec.basicRemote.sendText("/pm ${cuser},${message}")
+					}
+					if (!cuser.toString().endsWith(frontend)) {
+						found=findUser(cuser+frontend)
+						if (found) {
+							crec.basicRemote.sendText("/pm ${cuser+frontend},${message}")
 						}
 					}
 				}
 			}
-		} catch (IOException e) {
-			log.error ("onMessage failed", e)
 		}
 	}
 
 	def sendJobMessage(String job,String message) {
-		try {
-			synchronized (jobUsers) {
-				jobUsers?.each { crec->
-					if (crec && crec.isOpen()) {
-						String cuser = crec.userProperties.get("username") as String
-						String cjob =  crec.userProperties.get("job") as String
-						boolean found = false
-						if (job==cjob) {
-							crec.basicRemote.sendText("${message}")
-						}
-					}
+		jobNames.each { String cuser, Session crec ->
+			if (crec && crec.isOpen()) {
+				String cjob =  crec.userProperties.get("job") as String
+				boolean found = false
+				if (job==cjob) {
+					crec.basicRemote.sendText("${message}")
 				}
 			}
-
-		} catch (IOException e) {
-			log.error ("onMessage failed", e)
 		}
+
 	}
 
 
@@ -73,23 +59,16 @@ public class ClientListenerService extends ConfService implements UserSessions, 
 		if (user.endsWith(frontend)) {
 			user=user.substring(0,user.indexOf(frontend))
 		}
-		try {
-			synchronized (jobUsers) {
-				jobUsers?.each { crec->
-					if (crec && crec.isOpen()) {
-						String cuser = crec.userProperties.get("username") as String
-						String cjob =  crec.userProperties.get("job") as String
-						boolean found = false
-						if (user==cuser) {
-							crec.basicRemote.sendText("${message}")
-						}
-					}
+		jobNames.each { String cuser, Session crec ->
+			if (crec && crec.isOpen()) {
+				String cjob =  crec.userProperties.get("job") as String
+				boolean found = false
+				if (user==cuser) {
+					crec.basicRemote.sendText("${message}")
 				}
 			}
-
-		} catch (IOException e) {
-			log.error ("onMessage failed", e)
 		}
+
 	}
 
 	def sendBackEndPM(Session userSession, String user,String message) {
@@ -117,20 +96,15 @@ public class ClientListenerService extends ConfService implements UserSessions, 
 
 	boolean findUser(String username) {
 		boolean found = false
-		try {
-			synchronized (jobUsers) {
-				jobUsers?.each { crec->
-					if (crec && crec.isOpen()) {
-						def cuser = crec.userProperties.get("username").toString()
-						if (cuser.equals(username)) {
-							found = true
-						}
-					}
+		jobNames.each { String cuser, Session crec ->
+			if (crec && crec.isOpen()) {
+				//String cjob =  crec.userProperties.get("job") as String
+				if (cuser.equals(username)) {
+					found = true
 				}
 			}
-		} catch (IOException e) {
-			log.error ("onMessage failed", e)
 		}
+
 		return found
 	}
 
