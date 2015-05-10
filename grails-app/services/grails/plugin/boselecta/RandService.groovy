@@ -6,6 +6,8 @@ import java.security.SecureRandom
 
 class RandService {
 
+	static transactional = false
+
 	static prng = new SecureRandom()
 	
 	String randomise(String user) {

@@ -18,9 +18,8 @@ import javax.websocket.server.PathParam
 import javax.websocket.server.ServerContainer
 import javax.websocket.server.ServerEndpoint
 
-import org.codehaus.groovy.grails.web.context.ServletContextHolder as SCH
-import org.codehaus.groovy.grails.web.json.JSONObject
-import org.codehaus.groovy.grails.web.servlet.GrailsApplicationAttributes as GA
+import grails.util.Holders
+
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -39,17 +38,10 @@ class BoSelectaEndpoint  extends ConfService implements ServletContextListener {
 		ServletContext servletContext = event.servletContext
 		final ServerContainer serverContainer = servletContext.getAttribute("javax.websocket.server.ServerContainer")
 		try {
-
 			if (Environment.current == Environment.DEVELOPMENT) {
 				serverContainer.addEndpoint(BoSelectaEndpoint)
 			}
-
-			def ctx = servletContext.getAttribute(GA.APPLICATION_CONTEXT)
-
-			def grailsApplication = ctx.grailsApplication
-
-			config = grailsApplication.config.boselecta
-			int defaultMaxSessionIdleTimeout = config.timeout ?: 0
+			int defaultMaxSessionIdleTimeout = 0 // config.timeout ?: 0
 			serverContainer.defaultMaxSessionIdleTimeout = defaultMaxSessionIdleTimeout
 		}
 		catch (IOException e) {
@@ -63,9 +55,9 @@ class BoSelectaEndpoint  extends ConfService implements ServletContextListener {
 
 	@OnOpen
 	public void handleOpen(Session userSession,EndpointConfig c,@PathParam("job") String job) {
-		def ctx= SCH.servletContext.getAttribute(GA.APPLICATION_CONTEXT)
-		def grailsApplication = ctx.grailsApplication
-		config = grailsApplication.config.boselecta
+
+		def ctx = Holders.applicationContext
+
 		authService = ctx.authService
 		messagingService = ctx.messagingService
 		userSession.userProperties.put("job", job)

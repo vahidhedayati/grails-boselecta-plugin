@@ -37,7 +37,7 @@ class BoSelectaTagLib extends ConfService implements ClientSessions {
 		String event =  attrs.remove('event')?.toString()
 		String context = attrs.remove('context')?.toString()
 
-		String addAppName = config.add.appName ?: 'yes'
+		String addAppName = config.add.appName ?: 'no'
 
 		if (receivers) {
 			receivers = receivers as ArrayList

@@ -1,12 +1,10 @@
 package grails.plugin.boselecta
 
-import grails.plugin.boselecta.interfaces.UserSessions
-import grails.transaction.Transactional
-
 import javax.websocket.Session
 
-@Transactional
 class AuthService extends ConfService {
+
+	static transactional = false
 
 	def messagingService
 

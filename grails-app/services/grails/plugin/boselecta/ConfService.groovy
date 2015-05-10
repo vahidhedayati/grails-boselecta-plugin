@@ -5,15 +5,17 @@ import grails.plugin.boselecta.interfaces.UserSessions
 import java.util.concurrent.ConcurrentMap
 
 import javax.websocket.Session
+import grails.core.GrailsApplication
+import grails.core.support.GrailsApplicationAware
 
 
-
-class ConfService implements UserSessions {
+class ConfService implements UserSessions, GrailsApplicationAware {
 
 	static transactional  =  false
 
-	def grailsApplication
+	GrailsApplication grailsApplication
 
+	def config
 
 
 	public ConcurrentMap<String, Session> getJobNames() {
@@ -23,7 +25,7 @@ class ConfService implements UserSessions {
 	public Collection<String> getJobData() {
 		return Collections.unmodifiableSet(jobUsers.keySet())
 	}
-
+    /*
 	public Session getJobUser(String username) {
 		Session userSession = jobUsers.get(username)
 		return userSession
@@ -32,7 +34,7 @@ class ConfService implements UserSessions {
 	public boolean jobUserExists(String username) {
 		return jobData.contains(username)
 	}
-
+    */
 	public boolean destroyJobUser(String username) {
 		return jobUsers.remove(username) != null
 	}
@@ -52,7 +54,7 @@ class ConfService implements UserSessions {
 	}
 
 	String getAppName(){
-		String addAppName = config.add.appName ?: 'yes'
+		String addAppName = config.add.appName ?: 'no'
 		if (addAppName) {
 			grailsApplication.metadata['app.name']+"/"
 		}else{
@@ -79,8 +81,8 @@ class ConfService implements UserSessions {
 		return values
 	}
 
-	def getConfig() {
-		grailsApplication?.config?.boselecta
+	void setGrailsApplication(GrailsApplication ga) {
+		config = ga.config.boselecta
 	}
 
 }

@@ -1,15 +1,13 @@
 package grails.plugin.boselecta
 
-
-import grails.converters.JSON
 import grails.plugin.boselecta.interfaces.ClientSessions
-import grails.plugin.boselecta.interfaces.UserSessions
 
 import javax.websocket.ContainerProvider
 import javax.websocket.Session
 
 public class ClientListenerService extends ConfService implements ClientSessions {
 
+	static transactional = false
 
 	def sendArrayPM(Session userSession, String job,String message) {
 		jobNames.each { String cuser, Session crec ->
@@ -36,7 +34,7 @@ public class ClientListenerService extends ConfService implements ClientSessions
 		jobNames.each { String cuser, Session crec ->
 			if (crec && crec.isOpen()) {
 				String cjob =  crec.userProperties.get("job") as String
-				boolean found = false
+				//boolean found = false
 				if (job==cjob) {
 					crec.basicRemote.sendText("${message}")
 				}
@@ -62,7 +60,7 @@ public class ClientListenerService extends ConfService implements ClientSessions
 		jobNames.each { String cuser, Session crec ->
 			if (crec && crec.isOpen()) {
 				String cjob =  crec.userProperties.get("job") as String
-				boolean found = false
+				//boolean found = false
 				if (user==cuser) {
 					crec.basicRemote.sendText("${message}")
 				}
@@ -79,7 +77,7 @@ public class ClientListenerService extends ConfService implements ClientSessions
 	}
 
 	def sendPM(Session userSession, String user,String message) {
-		String username = userSession.userProperties.get("username") as String
+		//String username = userSession.userProperties.get("username") as String
 		boolean found
 
 		found=findUser(user)

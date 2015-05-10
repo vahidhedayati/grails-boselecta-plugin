@@ -59,15 +59,20 @@ This is a result of security issues faced by many who used [ajaxdependancyselect
 
 ###### Plugin will work with tomcat 7.0.54 + (inc. 8) running java 1.7+
 
+[codebase for grails 2.X](https://github.com/vahidhedayati/grails-boselecta-plugin/tree/grails2)
 
-###### Dependency : (once available) 
+###### Dependency Grails 3:
 ```groovy
-	compile ":boselecta:0.1" 
+	compile "org.grails.plugins:boselecta:1.0.1"
 ```
 
 ### Testing plugin 
 
-For now you can test it as an line plugin, please refer to [testbo demo project testing this plugin](https://github.com/vahidhedayati/testbo). It has all of the domainClasses and example gsp's in place. The BuildConfig.groovy has this plugin as an inline plugin. So with grails 2.4.4 :
+#### Under grails 3
+```
+git clone https://github.com/vahidhedayati/testbo-grails3.git
+```
+For grails 2 it did not end up getting published so for now you can test it as an line plugin, please refer to [testbo demo project testing this plugin](https://github.com/vahidhedayati/testbo). It has all of the domainClasses and example gsp's in place. The BuildConfig.groovy has this plugin as an inline plugin. So with grails 2.4.4 :
 
 
 ```

@@ -1,15 +1,12 @@
 package grails.plugin.boselecta
 
 import grails.converters.JSON
-import grails.plugin.boselecta.interfaces.UserSessions
 
 import javax.websocket.Session
 
-import org.codehaus.groovy.grails.web.json.JSONObject
-
-
 class MessagingService extends ConfService  {
 
+	static transactional = false
 
 	def sendMsg(Session userSession,String msg) {
 		try {
