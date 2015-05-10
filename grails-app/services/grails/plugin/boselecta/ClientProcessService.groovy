@@ -9,7 +9,8 @@ import org.codehaus.groovy.grails.web.json.JSONObject
 
 public class ClientProcessService extends ConfService implements ClientSessions {
 
-
+	static transactional  =  false
+	
 	def clientListenerService
 	def autoCompleteService
 

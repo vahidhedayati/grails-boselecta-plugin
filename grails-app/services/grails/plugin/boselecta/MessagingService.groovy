@@ -10,6 +10,7 @@ import org.codehaus.groovy.grails.web.json.JSONObject
 
 class MessagingService extends ConfService  {
 
+	static transactional  =  false
 
 	def sendMsg(Session userSession,String msg) {
 		try {

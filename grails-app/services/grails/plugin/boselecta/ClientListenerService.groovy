@@ -10,6 +10,7 @@ import javax.websocket.Session
 
 public class ClientListenerService extends ConfService implements ClientSessions {
 
+	static transactional  =  false
 
 	def sendArrayPM(Session userSession, String job,String message) {
 		jobNames.each { String cuser, Session crec ->

@@ -8,11 +8,10 @@ import org.codehaus.groovy.grails.web.json.JSONObject
 
 class AutoCompleteService {
 
-	static transactional = false
 	def grailsApplication
 
 	// No reference selection method i.e. belongsTo=UpperClass
-	//@Transactional
+	@Transactional
 	ArrayList selectNoRefDomainClass(String domainClaz, String domainClaz2, String searchField, String collectField, String bindName, String recordId) {
 		def primarySelectList = []
 		if ((domainClaz2) && (domainClaz) &&( recordId)) {
@@ -73,7 +72,8 @@ class AutoCompleteService {
 			clazz?.list()
 		}
 	}
-	//@Transactional
+	
+	@Transactional
 	def returnAutoList(String className, String searchField, String collectField) {
 		def results
 		if (className) {
@@ -98,7 +98,7 @@ class AutoCompleteService {
 		return cId
 	}
 
-	//@Transactional
+	@Transactional
 	def returnPrimaryList(String className,String searchField, String collectField ) {
 		def results
 		if (className) {

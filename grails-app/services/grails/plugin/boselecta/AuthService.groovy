@@ -8,6 +8,8 @@ import javax.websocket.Session
 @Transactional
 class AuthService extends ConfService {
 
+	static transactional  =  false
+	
 	def messagingService
 
 
