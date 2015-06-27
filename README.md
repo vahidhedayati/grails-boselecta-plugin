@@ -58,7 +58,7 @@ This is a result of security issues faced by many who used [ajaxdependancyselect
  [Video 1 Everything you need to know ](https://www.youtube.com/watch?v=CFPe9pSFJ3g)
   
 
-![diagram](https://raw.github.com/vahidhedayati/grails-bo-selecta/blob/grails2/documentation/boselecta.svg)
+![diagram](https://raw.githubusercontent.com/vahidhedayati/grails-boselecta-plugin/grails2/documentation/boselecta.png)
 
  BoSelecta can be incorporated to an existing grails app running ver 2>+. Supports both resource (pre 2.4) /assets (2.4+) based grails sites.
 
