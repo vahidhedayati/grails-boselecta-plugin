@@ -15,7 +15,7 @@ Class a {
   }
  ```
   
- Where XX is the depth you define, by default I am going to reduce to 4 and if you have a need to define more relations directly more than this then override the config value (found discussed further down)
+ Where XX is the depth you define, by default the plugin will use 4 if not defined. 
  
  This would only be used where you define 
  
@@ -26,7 +26,18 @@ Class a {
  ...  
  ```
  
- Refer to multi select pages to understand what this is all about
+ In the above example you got to domain4 so your depth would be 4.
+ 
+ Set 
+ ```
+ domainDepth="0"
+ ```
+ if its from one object to another but if in the case of above hasMany and you wish to load up those many then increase in your call. Refer to the video and example site.
+ 
+ You can also override the config value globally in your Config.groovy discussed further down.
+ 
+ 
+ #### Refer to multi select pages to understand what depth relates to.
  
  
     
@@ -45,14 +56,8 @@ This is a result of security issues faced by many who used [ajaxdependancyselect
 
  ### Video
  
- [Video 1 Basic tutorial](https://www.youtube.com/watch?v=wZJl-pPPlOA)
+ [Video 1 Everything you need to know ](https://www.youtube.com/watch?v=CFPe9pSFJ3g)
   
- [Video 2 More detailed lookups, defined values, multiple dependencies](https://www.youtube.com/watch?v=qbYvy2Uc_Fc)
-
-[Video 3 no ref/loose dependencies + randomizing username](https://www.youtube.com/watch?v=7FxYJjMLSjQ)
-
-[Video 4 - Final wrap up and a look into auto complete from autocomp to select + vice versa](https://www.youtube.com/watch?v=i5ksVE8KU8o)
-
 
 
  BoSelecta can be incorporated to an existing grails app running ver 2>+. Supports both resource (pre 2.4) /assets (2.4+) based grails sites.
