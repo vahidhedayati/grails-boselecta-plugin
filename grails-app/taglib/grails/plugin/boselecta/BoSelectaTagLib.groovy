@@ -113,7 +113,15 @@ class BoSelectaTagLib extends ConfService implements ClientSessions {
 		String value = attrs.remove('value')?.toString()
 		String nextValue = attrs.remove('nextValue')?.toString()
 		String placeHolder = attrs.remove('placeHolder')?.toString()
-
+		String hiddenField = attrs.remove('hiddenField')?.toString()
+		String jsonField = attrs.remove('jsonField')?.toString()
+		
+		int domainDepth=1
+		if (attrs.domainDepth) {
+			domainDepth+=attrs.domainDepth as int
+		}else{
+		 domainDepth=depth
+		}  
 		String max = attrs.remove('max')?.toString()
 		String order = attrs.remove('order')?.toString()
 
@@ -191,8 +199,9 @@ class BoSelectaTagLib extends ConfService implements ClientSessions {
 
 		// AutoComplete box
 		if (autoComplete) {
-			Map map = [value: value, setId:setId, user:user, job:job, name:name, dataList:dataList, searchField:searchField,
-				collectField: collectField, id:id, placeHolder:placeHolder, sDataList:sDataList, autoCompleteToSelect:autoCompleteToSelect]
+			Map map = [value: value, setId:setId, user:user, job:job, domainDepth: domainDepth, name:name, dataList:dataList, 
+				searchField:searchField, collectField: collectField, hiddenField:hiddenField, jsonField: jsonField,formatting:formatting,
+				 id:id, placeHolder:placeHolder, sDataList:sDataList, autoCompleteToSelect:autoCompleteToSelect]
 			loadTemplate(attrs,'genAutoComplete', map)
 		}
 
@@ -224,7 +233,7 @@ class BoSelectaTagLib extends ConfService implements ClientSessions {
 
 			// Parse taglib call for domain3..domainX and its setId's searchField and collectFields.....
 			// Add to a map called multiDomainMap
-			multiDomainMap = createDomainMap(attrs)
+			multiDomainMap = createDomainMap(attrs,domainDepth)
 
 			out << g.select(gsattrs)
 		}
@@ -232,7 +241,7 @@ class BoSelectaTagLib extends ConfService implements ClientSessions {
 
 		// Generate Message which is initial map containing default containing
 		// result set that then needs to be appended
-		def message = [setId: setId, secondary: domain2, primaryCollect: collectField, collectfield: collectField2,	primarySearch: searchField,
+		def message = [setId: setId, secondary: domain2, domainDepth: domainDepth,  primaryCollect: collectField, collectfield: collectField2,	primarySearch: searchField,
 			searchField:  searchField2, appendValue: appendValue, appendName: appendName, job:job, formatting:formatting, nextValue:nextValue,
 			primary: domain, max:max, order:order, cId: id,	autoCompletePrimary:autoCompletePrimary, dataList:dataList, sDataList:sDataList]
 
@@ -270,10 +279,10 @@ class BoSelectaTagLib extends ConfService implements ClientSessions {
 		}
 	}
 
-	private Map createDomainMap(attrs) {
+	private Map createDomainMap(attrs,def domainDepth) {
 		int a=3
 		def multiDomainMap = [:]
-		while (a < depth ) {
+		while (a < (domainDepth as int) ) {
 			String sId = attrs.remove('setId'+a)?.toString()
 			String sf=attrs.remove('searchField'+a)?.toString()
 			String cf=attrs.remove('collectField'+a)?.toString()

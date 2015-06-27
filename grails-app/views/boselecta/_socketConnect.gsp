@@ -21,39 +21,31 @@
 	var userList=[];
 
 	function processMessage( message) {
-	
 		//console.log(JSON.stringify(message.data));
-		
 		var jsonData = JSON.parse(message.data);
 		if (jsonData.message!=null) {
 			var itJson=isJson(jsonData.message);
-			if (itJson==true	) {
-			
+			if (itJson==true) {
 				var jsonData1 = JSON.parse(jsonData.message);
-				var appendValue, appendName, updated, updateValue, nextValue,formatting='';
+				var appendValue, appendName, updated, updateValue, nextValue,formatting,domainDepth='';
 				//auto comp
 				var cId,updateList='';
-				
 				if (jsonData1.updateThisDiv!=null) {
 					setId=jsonData1.updateThisDiv;
 				}
-				
-				
-				
 				if (jsonData1.appendValue!=null) {
 					appendValue=jsonData1.appendValue;
+				}
+				if (jsonData1.domainDepth!=null) {
+					domainDepth=jsonData1.domainDepth;
 				}
 				
 				if (jsonData1.appendName!=null) {
 					appendName=jsonData1.appendName;
 				}
-				
 				if (jsonData1.formatting!=null) {
-					formatting=jsonData1.formatting;
-					
-				}
-				
-				
+					formatting=jsonData1.formatting;	
+				}	
 				if (jsonData1.nextValue!=null) {
 					nextValue=jsonData1.nextValue;
 				}
@@ -61,7 +53,6 @@
 				if (jsonData1.updated!=null) {
 					updated=jsonData1.updated;
 				}
-				
 				if (jsonData1.updateValue!=null) {
 					updateValue=jsonData1.updateValue;
 				}
@@ -70,14 +61,17 @@
 				if (jsonData1.result!=null) {
 				    var jsonResult = jsonData1.result;
 				    updateView(jsonResult, setId, appendName, appendValue, updated, updateValue, nextValue,formatting);
-				
-					for (a=3; a < 10; a++) {
+					var to = parseInt(domainDepth)
+					if ((to==undefined)||(to==null)) {
+						to=3;
+					}
+					for (a=3; a < to; a++) {
 						var c=a;
 						try {
 							var cid = eval('jsonData1.setId'+c);
 					 		if (cid!=null) {
 					 			var jsonResult = eval('jsonData1.result'+c);
-					 			updateOtherView(jsonResult, cid, updateValue,formatting);
+					 			updateOtherView(jsonResult, cid, updateValue,formatting,appendName,appendValue);
 							}
 						} catch(ex) {
 						}	
@@ -85,26 +79,19 @@
 				}
 				
 				//Auto Complete function
-				
 				if (jsonData1.cId!=null) {
 					cId = jsonData1.cId;
 				}
-				
 				if (jsonData1.updateList!=null) {
 					updateList = jsonData1.updateList;
 				}
-				
-					if (jsonData1.updateAutoValue!=null) {
-						updateAutoValue = jsonData1.updateAutoValue;
-					}
-				
-				
-				
+				if (jsonData1.updateAutoValue!=null) {
+					updateAutoValue = jsonData1.updateAutoValue;
+				}
 				if (jsonData1.autoResult!=null) {
 					var autoResult = jsonData1.autoResult;
 					 updateAutoView(autoResult, cId, setId, appendName, appendValue, updated, updateValue, nextValue,formatting, updateList);
 				}
-				
 			}	
 		}
 
@@ -118,8 +105,27 @@
 }
 
 
-function updateOtherView(jsonResult,cid, updateValue,format) {
+function updateOtherView(jsonResult,cid, updateValue,format,appendName,appendValue) {
 	var id, name,resarray='';
+	//reset select box
+	var rselect = document.getElementById(cid);
+	if (rselect) {
+		var l = rselect.length
+		while (l > 0) {
+    		l--
+    		rselect.remove(l)
+  		}
+  	}
+  	if (appendName!="") { 	
+		var opt = document.createElement('option');
+		opt.value = appendValue;
+		opt.text = appendName;
+		try {
+			rselect.add(opt, null);
+		} catch(ex) {
+			rselect.add(opt);
+		}
+	}
 	jsonResult.forEach(function(entry) {
 		var rselect = document.getElementById(cid);
 		if (rselect) {
@@ -165,15 +171,14 @@ function updateAutoView(jsonResult, cId, setId, appendName, appendValue, updated
     }
 	jsonResult.forEach(function(item) {
         var option = document.createElement('option');
-        
-        option.label = item.name;
-        if (format == "JSON") {
-				//option.value = JSON.stringify(item.resarray);
-				option.id = JSON.stringify(item.resarray);
-		}
-		option.value = item.id;		
-			
-        dataList.appendChild(option);
+        //if (format == "JSON") {
+        	 option.setAttribute('data-value', JSON.stringify(item.resarray));
+        //}
+        option.value = item.id
+        option.textContent = item.name;
+
+        dataList.appendChild( option );
+       
     });
 } 
 
@@ -281,6 +286,7 @@ function processOpen(message) {
 
 
 window.onbeforeunload = function() {
+	webSocket${job}.send("DISCO:-");
 	webSocket${job}.onclose = function() { }
 	webSocket${job}.close();
 }

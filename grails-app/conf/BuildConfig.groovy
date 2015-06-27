@@ -2,6 +2,8 @@
 
 grails.project.work.dir = 'target'
 
+grails.project.dependency.resolver = "maven"
+
 grails.project.dependency.resolution = {
 	inherits 'global'
 	log 'warn'
@@ -10,6 +12,7 @@ grails.project.dependency.resolution = {
 		grailsCentral()
 		mavenLocal()
 		mavenCentral()
+		mavenRepo "https://repo.grails.org/grails/plugins"
 	}
 
 	dependencies {

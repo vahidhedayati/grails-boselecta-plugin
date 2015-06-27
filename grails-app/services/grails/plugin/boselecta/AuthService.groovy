@@ -30,6 +30,17 @@ class AuthService extends ConfService {
 	}
 
 
+	def destroyJob(String job) {
+		jobNames.each { String cuser, Session crec ->
+			if (crec && crec.isOpen()) {
+				String cjob  =  crec.userProperties.get("job") as String
+				if (cjob==job) {
+					crec.close()
+					destroyJobUser(cuser)
+				}
+			}
+		}
+	}
 
 	Boolean loggedIn(String user) {
 		Boolean loggedin = false

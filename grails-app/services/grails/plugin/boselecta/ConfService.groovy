@@ -23,12 +23,12 @@ class ConfService implements UserSessions {
 	public Collection<String> getJobData() {
 		return Collections.unmodifiableSet(jobUsers.keySet())
 	}
-
-	public Session getJobUser(String username) {
-		Session userSession = jobUsers.get(username)
+	
+	public Session getJobUser(String job) {
+		Session userSession = jobUsers.get(job)
 		return userSession
 	}
-
+	
 	public boolean jobUserExists(String username) {
 		return jobData.contains(username)
 	}
@@ -36,9 +36,7 @@ class ConfService implements UserSessions {
 	public boolean destroyJobUser(String username) {
 		return jobUsers.remove(username) != null
 	}
-
-
-
+	
 	boolean isConfigEnabled(String input) {
 		return Boolean.valueOf(input ?: false)
 	}
