@@ -106,16 +106,7 @@ class BoSelectaEndpoint  extends ConfService implements ServletContextListener {
 			}
 		}else{
 			if (message.startsWith("DISCO:-")) {
-				//destroyJobUser(username)
-				//userSession.close()
-				//Session usersSess = findSession(username+frontend)
-				//if (usersSess) {
-				//	destroyJobUser(username+frontend)
-				//	usersSess.close()
-				//}
-				
 				authService.destroyJob(job)
-				
 			}else if (message.startsWith("/pm")) {
 				def values = parseInput("/pm ",message)
 				String user = values.user as String
