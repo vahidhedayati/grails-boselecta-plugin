@@ -49,7 +49,6 @@ It then returns the full dependent result set as JSON through websockets (this b
 
 This is a result of security issues faced by many who used [ajaxdependancyselection plugin](https://github.com/vahidhedayati/ajaxdependancyselection). 
 
-##### This plugin is JQUERY and JQUERY-UI FREE - It will require your end user to have a browser with websocket support. 
 ##### Select box dependencies data comes from WebSocket Client running within your application (as part of the plugin)
 ##### AutoComplete input areas use HTML5 dataList, data for dataList provided by backend WebSocket Connection.
  
@@ -59,6 +58,7 @@ This is a result of security issues faced by many who used [ajaxdependancyselect
  [Video 1 Everything you need to know ](https://www.youtube.com/watch?v=CFPe9pSFJ3g)
   
 
+![diagram](https://raw.github.com/vahidhedayati/grails-bo-selecta/grails2/documentation/boselecta.svg)
 
  BoSelecta can be incorporated to an existing grails app running ver 2>+. Supports both resource (pre 2.4) /assets (2.4+) based grails sites.
 
