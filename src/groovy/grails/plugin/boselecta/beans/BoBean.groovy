@@ -134,16 +134,35 @@ class BoBean {
 		boolean loadPrimary = false
 	
 	
-	static contstraints = {
-		noSelection nullable: true
-		domain nullable: true
-		domain2 nullable: true
-		searchField2: nullable: true
-		collectField2: nullable: true
-		searchField: nullable: true
-		collectField: nullable: true
-		job (nullable: false, validator:validateInput)
-		user (nullable: false, validator:validateInput)
+	
+	static constraints = {
+		max(nullable: true, blank: true)
+		order(nullable: true, blank: true)
+		noSelection(nullable: true, blank: true)
+		name(nullable: true, blank: true)
+		appendValue(nullable: true, blank: true)
+		appendName(nullable: true, blank: true)
+		value(nullable: true, blank: true)
+		nextValue(nullable: true, blank: true)
+		placeHolder(nullable: true, blank: true)
+		hiddenField(nullable: true, blank: true)
+		jsonField(nullable: true, blank: true)
+		domainDepth(nullable: true, blank: true)
+		dataList(nullable: true, blank: true)
+		sdataList(nullable: true, blank: true)
+		
+		domain(nullable: true, blank: true)
+		searchField(nullable: true, blank: true)
+		collectField(nullable: true, blank: true)
+		bindid(nullable: true, blank: true)
+		
+		domain2(nullable: true, blank: true)
+		searchField2(nullable: true, blank: true)
+		collectField2(nullable: true, blank: true)
+		
+		id(nullable: false, validator:validateInput)
+		job(nullable: false, validator:validateInput)
+		user(nullable: false, validator:validateInput)
 	}
 
 	static def validateInput={value,object,errors->

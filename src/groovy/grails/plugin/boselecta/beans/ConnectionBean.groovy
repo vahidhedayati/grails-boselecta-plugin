@@ -1,6 +1,5 @@
 package grails.plugin.boselecta.beans
 
-import grails.converters.JSON
 import grails.plugin.boselecta.interfaces.ClientSessions
 import grails.util.Holders
 import grails.validation.Validateable
@@ -11,9 +10,9 @@ class ConnectionBean implements ClientSessions {
 	String user
 	String job
 	
-	Map actionMap
-	def jsonData
-	def receivers
+	//Map actionMap
+	//def jsonData
+	//def receivers
 	 
 	boolean autodisco = false
 	
@@ -27,10 +26,12 @@ class ConnectionBean implements ClientSessions {
 		return frontuser
 	}
 	
+	/*
 	def getReceivers()  {
 		if (receivers) {
 			receivers.add(frontuser)
 		}
+		return receivers
 	}
 	
 	def getJsonData() { 
@@ -40,7 +41,9 @@ class ConnectionBean implements ClientSessions {
 			}
 			jsonData = jsonData as JSON
 		}
+		return jsonData
 	}
+	*/
 	
 	def getUri() { 
 		String uri="ws://${hostname}/${appName}/${APP}/"
@@ -50,11 +53,11 @@ class ConnectionBean implements ClientSessions {
 		return uri
 	}
 	
-	static contstraints = {
-		actionMap nullable: true
-		receivers nullable: true
-		job (nullable: false, validator:validateInput)
-		user (nullable: false, validator:validateInput)
+	static constraints = {
+		//actionMap nullable: true
+		//receivers nullable: true
+		job nullable: false, validator:validateInput)
+		user(nullable: false, validator:validateInput)
 	}
 
 	static def validateInput={value,object,errors->
