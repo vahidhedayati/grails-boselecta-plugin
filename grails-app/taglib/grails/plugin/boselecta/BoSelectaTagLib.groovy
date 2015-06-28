@@ -58,7 +58,6 @@ class BoSelectaTagLib extends ConfService implements ClientSessions {
 		def bo = new BoBean(attrs)
 		if (!bo.validate()) {
 			bo.errors.allErrors.each {err ->
-				println "-- $err.field  @@ $err"
 				throwTagError("Tag [selecta] is missing required attribute [${err.field}]")
 			}
 		}
