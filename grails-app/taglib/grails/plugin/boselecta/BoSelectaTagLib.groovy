@@ -5,6 +5,7 @@ import grails.plugin.boselecta.interfaces.ClientSessions
 import grails.plugin.boselecta.beans.BoBean
 import grails.plugin.boselecta.beans.ConnectionBean
 import javax.websocket.Session
+import org.grails.taglib.GroovyPageAttributes
 
 class BoSelectaTagLib extends ConfService implements ClientSessions {
 
@@ -34,19 +35,18 @@ class BoSelectaTagLib extends ConfService implements ClientSessions {
 	 */
 	def connect  =  { attrs ->
 		def cBean = new ConnectionBean(attrs)
-		if (!cBean.job) {
-			throwTagError("Tag [connect] is missing required attribute [job]")
-		}
-		if (!cBean.user) {
-			throwTagError("Tag [connect] is missing required attribute [user]")
+		if (!cBean.validate()) {
+			cBean.errors.allErrors.each {err ->
+				throwTagError("Tag [connect] is missing required attribute [${err.field}]")
+			}
 		}
 		// Make a socket connection as actual main user (backend connection)
 		Session oSession = clientListenerService.p_connect(cBean)
-		loadTemplate(attrs,'socketConnect', cBean,null)
+		loadTemplate(attrs,'socketConnect', cBean)
 		if (cBean.autodisco) {
 			clientListenerService.disconnect(oSession)
 		}
-		loadTemplate(attrs,'socketProcess', cBean,null)
+		loadTemplate(attrs,'socketProcess', cBean)
 	}
 
 	/*
@@ -56,14 +56,11 @@ class BoSelectaTagLib extends ConfService implements ClientSessions {
 	 */
 	def selecta = {attrs ->
 		def bo = new BoBean(attrs)
-		def multiDomainMap = createDomainMap(attrs,bo.domainDepth)
-		String id = bo.id
-		if (!id) {
-			throwTagError("Tag [multiSelect] is missing required attribute [id]")
-		}
-		String searchField2=bo.searchField2
-		if (!searchField2) {
-			throwTagError("Tag [multiSelect] is missing required attribute [searchField]")
+		if (!bo.validate()) {
+			bo.errors.allErrors.each {err ->
+				println "-- $err.field  @@ $err"
+				throwTagError("Tag [selecta] is missing required attribute [${err.field}]")
+			}
 		}
 		if ((bo.domain) && (bo.bindid && (bo.bindid.endsWith('.id'))||(bo.norefPrimary))) {
 			bo.loadPrimary = true
@@ -75,10 +72,10 @@ class BoSelectaTagLib extends ConfService implements ClientSessions {
 		}
 		//AutoComplete
 		if (bo.autoComplete) {
-			loadTemplate(attrs,'genAutoComplete', bo,null)
+			loadTemplate(attrs,'genAutoComplete', bo)
 			//Select
 		}else{
-			def gsattrs=[optionKey: bo.collectField , optionValue: bo.searchField, id: id, value: bo.value, name: bo.name]
+			def gsattrs=[optionKey: bo.collectField , optionValue: bo.searchField, id: bo.id, value: bo.value, name: bo.name]
 			gsattrs['noSelection'] = attrs.noSelection
 			gsattrs['from'] = []
 			if (bo.loadPrimary && (bo.formatting != "JSON")) {
@@ -89,24 +86,23 @@ class BoSelectaTagLib extends ConfService implements ClientSessions {
 			}
 			if (bo.selectToAutoComplete) {
 				// auto complete javascript front end action
-				gsattrs['onchange'] = "javascript:updateList(this.value, '${id}',  '${bo.sdataList}', '${bo.setId}');"
+				gsattrs['onchange'] = "javascript:updateList(this.value, '${bo.id}',  '${bo.sdataList}', '${bo.setId}');"
 			}else{
 				//select javascript front end action
 				gsattrs['onchange'] = "javascript:actionThis(this.value, '${bo.setId}');"
 			}
-			// Parse taglib call for domain3..domainX and its setId's searchField and collectFields.....
-
 			out << g.select(gsattrs)
 		}
 		// Generate Message which is initial map containing default containing results to append
 		def message = [setId: bo.setId, secondary: bo.domain2, domainDepth: bo.domainDepth,  primaryCollect: bo.collectField,
-					   collectfield: bo.collectField2,	primarySearch: bo.searchField, searchField:  searchField2, appendValue: bo.appendValue,
+					   collectfield: bo.collectField2,	primarySearch: bo.searchField, searchField:  bo.searchField2, appendValue: bo.appendValue,
 					   appendName: bo.appendName, job:bo.job, formatting:bo.formatting, nextValue:bo.nextValue, primary: bo.domain, max:bo.max,
-					   order:bo.order, cId: id, autoCompletePrimary:bo.autoCompletePrimary, dataList:bo.dataList, sdataList:bo.sdataList]
+					   order:bo.order, cId: bo.id, autoCompletePrimary:bo.autoCompletePrimary, dataList:bo.dataList, sdataList:bo.sdataList]
 
 		if (bo.bindid) {
 			message.put('bindId', bo.bindid)
 		}
+		def multiDomainMap = createDomainMap(attrs,bo.domainDepth)
 		if (multiDomainMap) {
 			message += multiDomainMap
 		}
@@ -114,11 +110,11 @@ class BoSelectaTagLib extends ConfService implements ClientSessions {
 		clientListenerService.sendBackPM(bo.user, cc as String)
 		if (bo.value||bo.nextValue) {
 			Map map = [value: bo.value, setId:bo.setId, user:bo.user, job:bo.job]
-			loadTemplate(attrs,'actionNonAppendThis', null,map)
+			loadTemplate(attrs,'actionNonAppendThis', map)
 		}
 		if (bo.loadPrimary && (bo.formatting == "JSON")) {
-			Map jsonMap = [primarylist: bo.primarylist, id:id, formatting: bo.formatting, updateValue:bo.value]
-			loadTemplate(attrs,'primaryJSONParser', null, [message: jsonMap as JSON])
+			Map jsonMap = [primarylist: bo.primarylist, id:bo.id, formatting: bo.formatting, updateValue:bo.value]
+			loadTemplate(attrs,'primaryJSONParser', [message: jsonMap as JSON])
 		}
 	}
 
@@ -213,7 +209,7 @@ class BoSelectaTagLib extends ConfService implements ClientSessions {
 			Map map = [value: value, setId:setId, user:user, job:job, domainDepth: domainDepth, name:name, dataList:dataList,
 					   searchField:searchField, collectField: collectField, hiddenField:hiddenField, jsonField: jsonField,formatting:formatting,
 					   id:id, placeHolder:placeHolder, sdataList:sdataList, autoCompleteToSelect:autoCompleteToSelect]
-			loadTemplate(attrs,'genAutoComplete', null,map)
+			loadTemplate(attrs,'genAutoComplete', map)
 			//select function
 		}else{
 			def gsattrs=[optionKey: collectField , optionValue: searchField, id: id, value: value, name: name]
@@ -233,8 +229,6 @@ class BoSelectaTagLib extends ConfService implements ClientSessions {
 			multiDomainMap = createDomainMap(attrs,domainDepth)
 			out << g.select(gsattrs)
 		}
-		// Generate Message which is initial map containing default containing
-		// result set that then needs to be appended
 		def message = [setId: setId, secondary: domain2, domainDepth: domainDepth,  primaryCollect: collectField, collectfield: collectField2,
 					   primarySearch: searchField,	searchField:  searchField2, appendValue: appendValue, appendName: appendName, job:job,
 					   formatting:formatting, nextValue:nextValue,	primary: domain, max:max, order:order, cId: id,
@@ -249,26 +243,34 @@ class BoSelectaTagLib extends ConfService implements ClientSessions {
 		clientListenerService.sendBackPM(user, cc as String)
 		if (value||nextValue) {
 			Map map = [value: value, setId:setId, user:user, job:job]
-			loadTemplate(attrs,'actionNonAppendThis',null, map)
+			loadTemplate(attrs,'actionNonAppendThis', map)
 		}
 		if (loadPrimary && (formatting == "JSON")) {
 			Map jsonMap = [primarylist: primarylist, id:id, formatting: formatting, updateValue:value]
-			loadTemplate(attrs,'primaryJSONParser', null, [message: jsonMap as JSON])
+			loadTemplate(attrs,'primaryJSONParser', [message: jsonMap as JSON])
 		}
 	}
 
-	// Moved to gsp templates - so that you can override given template name
-	private void loadTemplate(attrs, String template, def cBean, Map myMap) {
+
+	/*  loadTemplate figures out if user has provided a template or if to load from
+	 *  within plugin
+	 *  Moved to gsp templates - so that you can override given template name
+	 */
+	private void loadTemplate(attrs, String template, def cBean=null, Map myMap=null) {
 		def userTemplate = attrs."${template}" ?: config."${template}"
 		def defaultTemplate = "/${VIEW}/${template}"
 		if (userTemplate) {
-				out << g.render(template: userTemplate, model: [instance: cBean ?: myMap])
+			out << g.render(template:userTemplate, model: [instance:cBean?:myMap])
 		}else{
 			out << g.render(contextPath: pluginContextPath, template: defaultTemplate, model: [instance:cBean?:myMap])
 		}
 	}
 
-	private Map createDomainMap(attrs,def domainDepth) {
+	/*
+	 *  creatDomainMap is a dynamic and append to attrs.
+	 *
+	 */
+	private Map createDomainMap(GroovyPageAttributes attrs,def domainDepth) {
 		int a=3
 		def multiDomainMap = [:]
 		while (a < (domainDepth as int) ) {
@@ -285,5 +287,4 @@ class BoSelectaTagLib extends ConfService implements ClientSessions {
 		}
 		return multiDomainMap
 	}
-
 }

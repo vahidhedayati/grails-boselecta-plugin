@@ -2,16 +2,7 @@
 <g:javascript>
 	var loggedInUsers=[];
 	var user="${instance.user }";
-
-
-<g:if test="${instance.addAppName=='no'}">
-	var uri="ws://${instance.hostname}/${instance.chatApp }/${instance.job}";
-</g:if>
-<g:else>
-	var uri="ws://${instance.hostname}/${instance.appName}/${instance.chatApp }/${instance.job}";
-</g:else>
-
-	var webSocket${instance.job}=new WebSocket(uri);
+	var webSocket${instance.job}=new WebSocket('${instance.uri}/${instance.job}');
 	webSocket${instance.job}.onopen=function(message) {processOpen(message);};
 	webSocket${instance.job}.onclose=function(message) {processClose(message);};
 	webSocket${instance.job}.onerror=function(message) {processError(message);};
