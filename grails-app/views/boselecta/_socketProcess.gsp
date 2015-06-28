@@ -2,17 +2,16 @@
 
 <g:javascript>
 	function actionThis(value, divid) {
-		webSocket${job}.send("/pm "+user+","+JSON.stringify({updateDiv : divid, updateValue : value}));
+		webSocket${instance.job}.send("/pm "+user+","+JSON.stringify({updateDiv : divid, updateValue : value}));
 	}
 
 	function actionNonAppendThis(value, divid) {
-		webSocket${job}.send("/pm "+user+","+JSON.stringify({updateDiv : divid, updateValue : value, updated: 'no'}));
+		webSocket${instance.job}.send("/pm "+user+","+JSON.stringify({updateDiv : divid, updateValue : value, updated: 'no'}));
 	}
 
 	function updateList(value, id, dataList, divid) {
-		webSocket${job}.send("/pm "+user+","+JSON.stringify({updateDiv : divid, updateList : dataList, updateAutoValue : value,  cId: id}));
+		webSocket${instance.job}.send("/pm "+user+","+JSON.stringify({updateDiv : divid, updateList : dataList, updateAutoValue : value,  cId: id}));
 	}
-
 	//function updatePlaceHolder(value, id, dataList) {
  		//var input = document.getElementById(id);
 		//var dataList = document.getElementById(dataList);

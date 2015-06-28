@@ -19,7 +19,6 @@ class AutoCompleteService {
 		if ((domainClaz2) && (domainClaz) &&( recordId)) {
 			def domainClass2 = grailsApplication?.getDomainClass(domainClaz2)?.clazz
 			def domainClass = grailsApplication?.getDomainClass(domainClaz)?.clazz
-			//domainClass2.withTransaction {
 			def domaininq=domainClass?.get(parseRecord(recordId).toLong())
 			if (domaininq) {
 				domaininq."${bindName}".each { dq ->
@@ -30,7 +29,6 @@ class AutoCompleteService {
 					primarySelectList.add(primaryMap)
 				}
 			}
-			//}
 		}
 		return primarySelectList
 	}
@@ -80,11 +78,9 @@ class AutoCompleteService {
 		def results
 		if (className) {
 			Class clazz = grailsApplication?.getDomainClass(className)?.clazz
-			//clazz.withTransaction {
 			def res = clazz.findAll()
 			results = res?.collect {[	'id': it."${collectField}", 'name': it."${searchField}" ,
-					'resarray': [selected: it."${collectField}",  selectedText:it."${searchField}" ]]}?.unique()
-			//}
+										 'resarray': [selected: it."${collectField}",  selectedText:it."${searchField}" ]]}?.unique()
 			return results
 		}
 	}
@@ -105,16 +101,10 @@ class AutoCompleteService {
 		def results
 		if (className) {
 			Class clazz = grailsApplication?.getDomainClass(className)?.clazz
-			//clazz.withTransaction {
 			def res = clazz.findAll()
 			results = res?.collect {[	'id': it."${collectField}", 'name': it."${searchField}" ,
-					'resarray': [selected: it."${collectField}", selectedText: it."${searchField}" ]]}?.unique()
-			//}
+										 'resarray': [selected: it."${collectField}", selectedText: it."${searchField}" ]]}?.unique()
 			return results
 		}
 	}
-
-
-
-
 }

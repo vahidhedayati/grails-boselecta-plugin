@@ -1,13 +1,14 @@
 package grails.plugin.boselecta
 
 import grails.plugin.boselecta.interfaces.ClientSessions
-
+import grails.plugin.boselecta.beans.ConnectionBean
 import javax.websocket.ContainerProvider
 import javax.websocket.Session
 
 public class ClientListenerService extends ConfService implements ClientSessions {
 
 	static transactional = false
+	def randService
 
 	def sendArrayPM(Session userSession, String job,String message) {
 		jobNames.each { String cuser, Session crec ->
@@ -34,22 +35,18 @@ public class ClientListenerService extends ConfService implements ClientSessions
 		jobNames.each { String cuser, Session crec ->
 			if (crec && crec.isOpen()) {
 				String cjob =  crec.userProperties.get("job") as String
-				//boolean found = false
 				if (job==cjob) {
 					crec.basicRemote.sendText("${message}")
 				}
 			}
 		}
-
 	}
-
 
 	def sendFrontEndPM(Session userSession, String user,String message) {
 		def found=findUser(user+frontend)
 		// Fixed - private messaging from backend to front-end
 		// messages were getting sent to all before.
 		userSession.basicRemote.sendText("/pm ${user+frontend},${message}")
-
 	}
 
 	// Added backend PM - new connection info was being relayed to all before.
@@ -60,13 +57,11 @@ public class ClientListenerService extends ConfService implements ClientSessions
 		jobNames.each { String cuser, Session crec ->
 			if (crec && crec.isOpen()) {
 				String cjob =  crec.userProperties.get("job") as String
-				//boolean found = false
 				if (user==cuser) {
 					crec.basicRemote.sendText("${message}")
 				}
 			}
 		}
-
 	}
 
 	def sendBackEndPM(Session userSession, String user,String message) {
@@ -77,9 +72,8 @@ public class ClientListenerService extends ConfService implements ClientSessions
 	}
 
 	def sendPM(Session userSession, String user,String message) {
-		//String username = userSession.userProperties.get("username") as String
+		String username = userSession.userProperties.get("username") as String
 		boolean found
-
 		found=findUser(user)
 		if (found) {
 			userSession.basicRemote.sendText("/pm ${user},${message}")
@@ -96,13 +90,11 @@ public class ClientListenerService extends ConfService implements ClientSessions
 		boolean found = false
 		jobNames.each { String cuser, Session crec ->
 			if (crec && crec.isOpen()) {
-				//String cjob =  crec.userProperties.get("job") as String
 				if (cuser.equals(username)) {
 					found = true
 				}
 			}
 		}
-
 		return found
 	}
 
@@ -111,39 +103,40 @@ public class ClientListenerService extends ConfService implements ClientSessions
 		userSession.basicRemote.sendText(message)
 	}
 
-	Session p_connect(String _uri, String _username, String room){
+	Session p_connect(ConnectionBean cBean){
+		String uri = cBean.uri
+		String job = cBean.job ?: randService.shortRand('noJob')
+		String username = cBean.user ?: randService.shortRand('noUser')
 		URI oUri
-		if(_uri){
-			oUri = URI.create(_uri+room);
+		if(uri){
+			oUri = URI.create(uri+job);
 		}
+
 		def container = ContainerProvider.getWebSocketContainer()
-		Session oSession
+		Session sess
 		try{
-			oSession = container.connectToServer(BoSelectaClientEndpoint.class, oUri)
-			oSession.basicRemote.sendText(CONNECTOR+_username)
+			sess = container.connectToServer(BoSelectaClientEndpoint.class, oUri)
+			sess.basicRemote.sendText(CONNECTOR+username)
 		}catch(Exception e){
 			e.printStackTrace()
-			if(oSession && oSession.isOpen()){
-				oSession.close()
+			if(sess && sess.isOpen()){
+				sess.close()
 			}
 			return null
 		}
-		oSession.userProperties.put("username", _username)
-		return  oSession
+		sess.userProperties.put("username", username)
+		return  sess
 	}
 
-
-	public Session disconnect(Session _oSession){
+	public Session disconnect(Session sess){
 		try{
-			if(_oSession && _oSession.isOpen()){
-				sendMessage(_oSession, DISCONNECTOR)
+			if(sess && sess.isOpen()){
+				sendMessage(sess, DISCONNECTOR)
 			}
 		}catch (Exception e){
 			e.printStackTrace()
 		}
-		return _oSession
+		return sess
 	}
-
-
-
 }
+

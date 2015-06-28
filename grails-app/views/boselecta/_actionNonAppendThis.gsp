@@ -1,5 +1,5 @@
 <script type="text/javascript">
 	setTimeout(function(){
-		actionNonAppendThis('${value}', '${setId}');
+		actionNonAppendThis('${instance.value}', '${instance.setId}');
 	},600);
 </script>
