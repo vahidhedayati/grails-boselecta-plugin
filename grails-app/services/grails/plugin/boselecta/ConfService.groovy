@@ -15,7 +15,6 @@ class ConfService implements UserSessions {
 	def grailsApplication
 
 
-
 	public ConcurrentMap<String, Session> getJobNames() {
 		return jobUsers
 	}

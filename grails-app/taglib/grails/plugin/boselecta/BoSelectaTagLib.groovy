@@ -1,6 +1,8 @@
 package grails.plugin.boselecta
 
 import grails.converters.JSON
+import grails.plugin.boselecta.beans.BoBean
+import grails.plugin.boselecta.beans.ConnectionBean
 import grails.plugin.boselecta.interfaces.ClientSessions
 
 import javax.websocket.Session
@@ -9,93 +11,124 @@ class BoSelectaTagLib extends ConfService implements ClientSessions {
 
 	static namespace  =  "bo"
 	static returnObjectForTags = ['randomizeUser']
+	
 	def clientListenerService
 	def autoCompleteService
 	def randService
 
+	
+	/*
+	 * Used in demo site to randomise username
+	 * and keep a stale randomised user through out gsp:
+	 *  user1="${bo.randomizeUser('user': 'random1') }"
+	 *  <g:set var="user1" value="${bo.randomizeUser('user': 'random1') }" />
+	 *  then user="${user1}" through out each call on same page
+	 */
 	def randomizeUser = { attrs ->
-		String user = attrs.remove('user')?.toString()
-		if (user) {
-			out << randService.randomise(user)
-		}
+		out << randService.randomise(attrs.user?:'noUser')
 	}
 
+	/*
+	 * <bo:connect
+	 * Master page connection that handles all the I/O
+	 * for each call below
+	 */
 	def connect  =  { attrs ->
-		def job = attrs.remove('job')?.toString()
-		def actionMap = attrs.remove('actionMap')
-		def jsonData = attrs.remove('jsonData')
-		def receivers = attrs.remove('receivers')
-		boolean strictMode = attrs.remove('strictMode')?.toBoolean() ?: false
-		boolean autodisco = attrs.remove('autodisco')?.toBoolean() ?: false
-		boolean masterNode = attrs.remove('masterNode')?.toBoolean() ?: false
-
-		String hostname = attrs.remove('hostname')?.toString()
-		String appName = attrs.remove('appName')?.toString()
-		String user = attrs.remove('user')?.toString()
-		String divId = attrs.remove('divId')?.toString() ?: ''
-		String sendType = attrs.remove('sendType')?.toString() ?: 'message'
-		String event =  attrs.remove('event')?.toString()
-		String context = attrs.remove('context')?.toString()
-
-		String addAppName = config.add.appName ?: 'yes'
-
-		if (receivers) {
-			receivers = receivers as ArrayList
+		def cBean = new ConnectionBean(attrs)
+		if (!cBean.job) {
+			throwTagError("Tag [connect] is missing required attribute [job]")
 		}
-
-		if (jsonData) {
-			if(jsonData instanceof String) {
-				jsonData =JSON.parse(jsonData)
-			}
-			jsonData = jsonData as JSON
+		if (!cBean.user) {
+			throwTagError("Tag [connect] is missing required attribute [user]")
 		}
-
-		String frontuser=user+frontend
-		if (receivers &&  (receivers instanceof ArrayList) ) {
-			receivers.add(frontuser)
-		}
-
-		if (actionMap) {
-			actionMap = actionMap as Map
-		}
-
-		if (!appName) {
-			appName = grailsApplication.metadata['app.name']
-		}
-
-		if (!hostname) {
-			hostname = config.hostname ?: 'localhost:8080'
-		}
-		if (!message) {
-			message = "testing"
-		}
-
-		String uri="ws://${hostname}/${appName}/${APP}/"
-		if (addAppName=="no") {
-			uri="ws://${hostname}/${APP}/"
-		}
-
 		// Make a socket connection as actual main user (backend connection)
-		Session oSession = clientListenerService.p_connect(uri, user, job)
-
-		Map model = [   job: job, hostname: hostname, actionMap: actionMap,
-			appName: appName, frontuser:frontuser,  user: user,  receivers: receivers, divId: divId,
-			chatApp: APP, addAppName: addAppName ]
-
-		loadTemplate(attrs,'socketConnect', model)
-
-
-		if (autodisco) {
+		Session oSession = clientListenerService.p_connect(cBean)
+		loadTemplate(attrs,'socketConnect', cBean)
+		if (cBean.autodisco) {
 			clientListenerService.disconnect(oSession)
 		}
+		loadTemplate(attrs,'socketProcess', cBean)
+	}
+	
+	/*
+	 * Main call locked down up to to domain2
+	 * If you wish to expand depth use <bo:selecta2 and keep everything else the same
+	 * this ties in the BoBean and validates input to ensure nothing extra gets in
+	 */
+	def selecta = {attrs ->
+		def bo = new BoBean(attrs)
+		def multiDomainMap = createDomainMap(attrs,bo.domainDepth)
+		String id = bo.id
+		if (!id) {
+			throwTagError("Tag [multiSelect] is missing required attribute [id]")
+		}
+		String searchField2=bo.searchField2
+		if (!searchField2) {
+			throwTagError("Tag [multiSelect] is missing required attribute [searchField]")
+		}
+		if ((bo.domain) && (bo.bindid && (bo.bindid.endsWith('.id'))||(bo.norefPrimary))) {
+			bo.loadPrimary = true
+			if (bo.formatting == "JSON") {
+				bo.primarylist = autoCompleteService.returnPrimaryList(bo.domain, bo.searchField, bo.collectField)
+			}else{
+				bo.primarylist = autoCompleteService.returnPrimaryList(bo.domain)
+			}
+		}
+		//AutoComplete
+		if (bo.autoComplete) {
+			loadTemplate(attrs,'genAutoComplete', bo)
+		//Select
+		}else{
+			def gsattrs=[optionKey: bo.collectField , optionValue: bo.searchField, id: id, value: bo.value, name: bo.name]
+			gsattrs['noSelection'] = attrs.noSelection
+			gsattrs['from'] = []
+			if (bo.loadPrimary && (bo.formatting != "JSON")) {
+				gsattrs['from'] = bo.primarylist
+			}
+			if (bo.requireField) {
+				gsattrs['required'] = 'required'
+			}
+			if (bo.selectToAutoComplete) {
+				// auto complete javascript front end action
+				gsattrs['onchange'] = "javascript:updateList(this.value, '${id}',  '${bo.sdataList}', '${bo.setId}');"
+			}else{
+				//select javascript front end action
+				gsattrs['onchange'] = "javascript:actionThis(this.value, '${bo.setId}');"
+			}
+			// Parse taglib call for domain3..domainX and its setId's searchField and collectFields.....
+			
+			out << g.select(gsattrs)
+		}
+		// Generate Message which is initial map containing default containing results to append
+		def message = [setId: bo.setId, secondary: bo.domain2, domainDepth: bo.domainDepth,  primaryCollect: bo.collectField,
+			collectfield: bo.collectField2,	primarySearch: bo.searchField, searchField:  searchField2, appendValue: bo.appendValue,
+			appendName: bo.appendName, job:bo.job, formatting:bo.formatting, nextValue:bo.nextValue, primary: bo.domain, max:bo.max,
+			order:bo.order, cId: id, autoCompletePrimary:bo.autoCompletePrimary, dataList:bo.dataList, sdataList:bo.sdataList]
 
-		Map map2 = [job: job]
-		loadTemplate(attrs,'socketProcess', map2)
+		if (bo.bindid) {
+			message.put('bindId', bo.bindid)
+		}
+		if (multiDomainMap) {
+			message += multiDomainMap
+		}
+		def cc=message as JSON
+		clientListenerService.sendBackPM(bo.user, cc as String)
+		if (bo.value||bo.nextValue) {
+			Map map = [value: bo.value, setId:bo.setId, user:bo.user, job:bo.job]
+			loadTemplate(attrs,'actionNonAppendThis', map)
+		}
+		if (bo.loadPrimary && (bo.formatting == "JSON")) {
+			Map jsonMap = [primarylist: bo.primarylist, id:id, formatting: bo.formatting, updateValue:bo.value]
+			loadTemplate(attrs,'primaryJSONParser', [message: jsonMap as JSON])
+		}
 	}
 
-
-	def selecta = {attrs ->
-		def clazz = ""
+	/*
+	 * <bo:selecta2
+	 * infinite depth :- for more secure locked down call use:
+	 * <bo:selecta which verifies inputvia BoBean. Only supports up to domain2
+	 */
+	def selecta2 = {attrs ->
 		String job = attrs.remove('job')?.toString()
 		String user = attrs.remove('user')?.toString()
 		String id = attrs.remove('id')?.toString()
@@ -120,63 +153,44 @@ class BoSelectaTagLib extends ConfService implements ClientSessions {
 		if (attrs.domainDepth) {
 			domainDepth+=attrs.domainDepth as int
 		}else{
-		 domainDepth=depth
-		}  
+		 	domainDepth=depth
+		}
 		String max = attrs.remove('max')?.toString()
 		String order = attrs.remove('order')?.toString()
-
-
 		boolean norefPrimary = attrs.remove('norefPrimary')?.toBoolean() ?: false
 		boolean autoComplete = attrs.remove('autoComplete')?.toBoolean() ?: false
 		boolean autoCompletePrimary = attrs.remove('autoCompletePrimary')?.toBoolean() ?: false
-
 		boolean selectToAutoComplete = attrs.remove('selectToAutoComplete')?.toBoolean() ?: false
 		boolean autoCompleteToSelect = attrs.remove('autoCompleteToSelect')?.toBoolean() ?: false
-
-
 		// Format can be set as JSON
 		String formatting = attrs.remove('formatting')?.toString() ?: config.formatting ?: 'none'
-
 		boolean require = attrs.remove('require')?.toBoolean() ?: false
-
 		if (!id) {
 			throwTagError("Tag [multiSelect] is missing required attribute [id]")
 		}
-
 		searchField2 = searchField2 ?: searchField
 		if (!searchField2) {
 			throwTagError("Tag [multiSelect] is missing required attribute [searchField]")
 		}
-
 		collectField2 = collectField2 ?: collectField
 		if (!collectField2) {
 			collectField2 = searchField2
 		}
-
 		if (!collectField) {
 			collectField=collectField2
 		}
-
 		if (!searchField) {
 			searchField=searchField2
 		}
-
 		if (!setId) {
 			setId = "selectPrimary"
 		}
-
-		if (attrs.class) {
-			clazz = " class='${attrs.class}'"
-		}
-
 		if (!name) {
 			name = id
 		}
-
 		if ((appendValue)&&(!appendName)) {
 			appendName='Values Updated'
 		}
-
 		Boolean requireField=true
 		if (require) {
 			requireField=require
@@ -191,75 +205,52 @@ class BoSelectaTagLib extends ConfService implements ClientSessions {
 				primarylist = autoCompleteService.returnPrimaryList(domain)
 			}
 		}
-
+		
 		def multiDomainMap
-
 		String dataList = "${id}-datalist"
-		String sDataList = "${setId}-datalist"
-
+		String sdataList = "${setId}-datalist"
 		// AutoComplete box
 		if (autoComplete) {
-			Map map = [value: value, setId:setId, user:user, job:job, domainDepth: domainDepth, name:name, dataList:dataList, 
+			Map map = [value: value, setId:setId, user:user, job:job, domainDepth: domainDepth, name:name, dataList:dataList,
 				searchField:searchField, collectField: collectField, hiddenField:hiddenField, jsonField: jsonField,formatting:formatting,
-				 id:id, placeHolder:placeHolder, sDataList:sDataList, autoCompleteToSelect:autoCompleteToSelect]
+				 id:id, placeHolder:placeHolder, sdataList:sdataList, autoCompleteToSelect:autoCompleteToSelect]
 			loadTemplate(attrs,'genAutoComplete', map)
-		}
-
-		// Select Box
-		else{
-
+		//select function
+		}else{
 			def gsattrs=[optionKey: collectField , optionValue: searchField, id: id, value: value, name: name]
-
 			gsattrs['noSelection'] = attrs.noSelection
 			gsattrs['from'] = []
 			if (loadPrimary && (formatting != "JSON")) {
 				gsattrs['from'] = primarylist
 			}
-
-
 			if (requireField) {
 				gsattrs['required'] = 'required'
 			}
-
-
 			if (selectToAutoComplete) {
-				gsattrs['onchange'] = "javascript:updateList(this.value, '${id}',  '${sDataList}', '${setId}');"
-
+				gsattrs['onchange'] = "javascript:updateList(this.value, '${id}',  '${sdataList}', '${setId}');"
 			}else{
-				// 	Front End JAVA Script actioned by socketProcess gsp template
-				//gsattrs['onchange'] = "javascript:actionThis(this.value, '${setId}', '${user}', '${job}');"
 				gsattrs['onchange'] = "javascript:actionThis(this.value, '${setId}');"
 			}
-
-			// Parse taglib call for domain3..domainX and its setId's searchField and collectFields.....
-			// Add to a map called multiDomainMap
 			multiDomainMap = createDomainMap(attrs,domainDepth)
-
 			out << g.select(gsattrs)
 		}
-
-
 		// Generate Message which is initial map containing default containing
 		// result set that then needs to be appended
-		def message = [setId: setId, secondary: domain2, domainDepth: domainDepth,  primaryCollect: collectField, collectfield: collectField2,	primarySearch: searchField,
-			searchField:  searchField2, appendValue: appendValue, appendName: appendName, job:job, formatting:formatting, nextValue:nextValue,
-			primary: domain, max:max, order:order, cId: id,	autoCompletePrimary:autoCompletePrimary, dataList:dataList, sDataList:sDataList]
-
+		def message = [setId: setId, secondary: domain2, domainDepth: domainDepth,  primaryCollect: collectField, collectfield: collectField2,	
+			primarySearch: searchField,	searchField:  searchField2, appendValue: appendValue, appendName: appendName, job:job, 
+			formatting:formatting, nextValue:nextValue,	primary: domain, max:max, order:order, cId: id,	
+			autoCompletePrimary:autoCompletePrimary, dataList:dataList, sdataList:sdataList]
 		if (bindid) {
 			message.put('bindId', bindid)
 		}
-
 		if (multiDomainMap) {
 			message += multiDomainMap
 		}
-
 		def cc=message as JSON
 		clientListenerService.sendBackPM(user, cc as String)
-
 		if (value||nextValue) {
 			Map map = [value: value, setId:setId, user:user, job:job]
 			loadTemplate(attrs,'actionNonAppendThis', map)
-
 		}
 		if (loadPrimary && (formatting == "JSON")) {
 			Map jsonMap = [primarylist: primarylist, id:id, formatting: formatting, updateValue:value]
@@ -267,15 +258,14 @@ class BoSelectaTagLib extends ConfService implements ClientSessions {
 		}
 	}
 
-
 	// Moved to gsp templates - so that you can override given template name
-	private void loadTemplate(attrs, String template, Map myMap) {
+	private void loadTemplate(attrs, String template, def cBean=null, Map myMap=null) {
 		def userTemplate = attrs."${template}" ?: config."${template}"
 		def defaultTemplate = "/${VIEW}/${template}"
 		if (userTemplate) {
-			out << g.render(template:userTemplate, model: myMap)
+			out << g.render(template:userTemplate, model: [instance:cBean?:myMap])
 		}else{
-			out << g.render(contextPath: pluginContextPath, template: defaultTemplate, model: myMap)
+			out << g.render(contextPath: pluginContextPath, template: defaultTemplate, model: [instance:cBean?:myMap])
 		}
 	}
 

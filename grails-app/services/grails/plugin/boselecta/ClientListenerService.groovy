@@ -1,6 +1,7 @@
 package grails.plugin.boselecta
 
 
+import grails.plugin.boselecta.beans.ConnectionBean
 import grails.plugin.boselecta.interfaces.ClientSessions
 
 import javax.websocket.ContainerProvider
@@ -9,6 +10,7 @@ import javax.websocket.Session
 public class ClientListenerService extends ConfService implements ClientSessions {
 
 	static transactional  =  false
+	def randService
 
 	def sendArrayPM(Session userSession, String job,String message) {
 		jobNames.each { String cuser, Session crec ->
@@ -103,10 +105,13 @@ public class ClientListenerService extends ConfService implements ClientSessions
 		userSession.basicRemote.sendText(message)
 	}
 
-	Session p_connect(String _uri, String username, String job){
+	Session p_connect(ConnectionBean cBean){
+		String uri = cBean.uri
+		String job = cBean.job ?: randService.shortRand('noJob')
+		String username = cBean.user ?: randService.shortRand('noUser')
 		URI oUri
-		if(_uri){
-			oUri = URI.create(_uri+job);
+		if(uri){
+			oUri = URI.create(uri+job);
 		}
 		
 		

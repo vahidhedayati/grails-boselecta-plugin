@@ -113,7 +113,7 @@ public class ClientProcessService extends ConfService implements ClientSessions 
 		String updateAutoValue = rmesg.updateAutoValue  // params.term
 		String cId = rmesg.cId
 
-		String sDataList = rmesg.sDataList
+		String sdataList = rmesg.sdataList
 		String dataList = rmesg.dataList
 
 		boolean autoCompletePrimary = rmesg?.autoCompletePrimary?.toBoolean() ?: false
@@ -123,7 +123,7 @@ public class ClientProcessService extends ConfService implements ClientSessions 
 			//Set<HashMap<String,String>> storedMap= Collections.synchronizedSet(new HashSet<HashMap<String,String>>())
 			def myMap = [jobUser:username,  setId: setId,  domainDepth:domainDepth, secondary: secondary,collectfield:collectfield, searchField:searchField, bindId:bindId,
 				appendValue:appendValue, primary:primary, appendName:appendName, nextValue:nextValue, formatting:formatting, order: order,
-				max:max, dataList:dataList, sDataList:sDataList, primaryCollect:primaryCollect, primarySearch: primarySearch]
+				max:max, dataList:dataList, sdataList:sdataList, primaryCollect:primaryCollect, primarySearch: primarySearch]
 			
 			for (int a=3; a <= domainDepth; a++ ) {
 				myMap += [("setId${a}"): rmesg."setId${a}", ("domain${a}"): rmesg."domain${a}",("domainDepth${a}"):domainDepth,
@@ -167,7 +167,7 @@ public class ClientProcessService extends ConfService implements ClientSessions 
 						nextValue = s.nextValue
 						primary = s.primary
 						dataList = s.dataList
-						sDataList = s.DataList
+						sdataList = s.sdataList
 						domainDepth=s.domainDepth
 					}
 					if (go) {
@@ -229,7 +229,7 @@ public class ClientProcessService extends ConfService implements ClientSessions 
 						max = s.max
 						cId = s.cId
 						dataList = s.dataList
-						sDataList = s.DataList
+						sdataList = s.sdataList
 						primaryCollect = s.primaryCollect
 						primarySearch = s.primarySearch
 					}

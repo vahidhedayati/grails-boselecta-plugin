@@ -1,5 +1,5 @@
 <g:javascript>
-	var message = '${message}';
+	var message = '${instance.message}';
 	var jsonData = JSON.parse(message);
 	var jsonResult = jsonData.primarylist;
 	var cid = jsonData.id;

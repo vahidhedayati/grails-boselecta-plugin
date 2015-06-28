@@ -1,21 +1,21 @@
 
 <g:javascript>
 	var loggedInUsers=[];
-	var user="${user }";
+	var user="${instance.user }";
 
 
-<g:if test="${addAppName=='no'}">
-	var uri="ws://${hostname}/${chatApp }/${job}";
+<g:if test="${instance.addAppName=='no'}">
+	var uri="ws://${instance.hostname}/${instance.chatApp }/${instance.job}";
 </g:if>
 <g:else>
-	var uri="ws://${hostname}/${appName}/${chatApp }/${job}";
+	var uri="ws://${instance.hostname}/${instance.appName}/${instance.chatApp }/${instance.job}";
 </g:else>
 
-	var webSocket${job}=new WebSocket(uri);
-	webSocket${job}.onopen=function(message) {processOpen(message);};
-	webSocket${job}.onclose=function(message) {processClose(message);};
-	webSocket${job}.onerror=function(message) {processError(message);};
-	webSocket${job}.onmessage=function(message) {processMessage(message);	};
+	var webSocket${instance.job}=new WebSocket(uri);
+	webSocket${instance.job}.onopen=function(message) {processOpen(message);};
+	webSocket${instance.job}.onclose=function(message) {processClose(message);};
+	webSocket${instance.job}.onerror=function(message) {processError(message);};
+	webSocket${instance.job}.onmessage=function(message) {processMessage(message);	};
 
 
 	var userList=[];
@@ -98,8 +98,8 @@
 	// Log out user if system tells it to	
 	if (jsonData.system != null) {
 		if (jsonData.system == "disconnect") { 
-			webSocket${job}.send("DISCO:-"+user);
-			webSocket${job}.close();
+			webSocket${instance.job}.send("DISCO:-"+user);
+			webSocket${instance.job}.close();
 		}
 	}
 }
@@ -267,27 +267,27 @@ function addUser(uid) {
 }
 
 function processClose(message) {
-	webSocket${job}.send("DISCO:-"+user);
-	webSocket${job}.close();
+	webSocket${instance.job}.send("DISCO:-"+user);
+	webSocket${instance.job}.close();
 }
 
 
 // Open connection only if we have frontuser variable    
 function processOpen(message) {
-	<g:if test="${frontuser}">
-		webSocket${job}.send("CONN:-${frontuser}");
+	<g:if test="${instance.frontuser}">
+		webSocket${instance.job}.send("CONN:-${instance.frontuser}");
 	</g:if>
 	<g:else>
-		webSocket${job}.send("DISCO:-");
-		webSocket${job}.close();
+		webSocket${instance.job}.send("DISCO:-");
+		webSocket${instance.job}.close();
 	</g:else>
 }
 
 
 
 window.onbeforeunload = function() {
-	webSocket${job}.send("DISCO:-");
-	webSocket${job}.onclose = function() { }
-	webSocket${job}.close();
+	webSocket${instance.job}.send("DISCO:-");
+	webSocket${instance.job}.onclose = function() { }
+	webSocket${instance.job}.close();
 }
 </g:javascript>
