@@ -56,7 +56,7 @@ class ConnectionBean implements ClientSessions {
 	static constraints = {
 		//actionMap nullable: true
 		//receivers nullable: true
-		job nullable: false, validator:validateInput)
+		job(nullable: false, validator:validateInput)
 		user(nullable: false, validator:validateInput)
 	}
 
