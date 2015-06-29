@@ -72,3 +72,35 @@ domain4=""
 #### [JSON Formatting](https://github.com/vahidhedayati/grails-boselecta-plugin/wiki/JSON-Formatting).
 
 ##### [What is front-end / back-end WebSocket connections](https://github.com/vahidhedayati/grails-boselecta-plugin/wiki/What-is-front-end---back-end-WebSocket-connections) ?
+
+
+##Examples:
+
+[autoComplete](https://github.com/vahidhedayati/testbo/blob/master/grails-app/views/test/autoComplete.gsp)
+
+[autoCompleteToSelect](https://github.com/vahidhedayati/testbo/blob/master/grails-app/views/test/autoCompleteToSelect.gsp)
+
+[autoCompleteToSelect2](https://github.com/vahidhedayati/testbo/blob/master/grails-app/views/test/autoCompleteToSelect2.gsp)
+
+[definedselectvalues](https://github.com/vahidhedayati/testbo/blob/master/grails-app/views/test/definedselectvalues.gsp)
+
+[definedselectvalues2](https://github.com/vahidhedayati/testbo/blob/master/grails-app/views/test/definedselectvalues2.gsp)
+
+[definedselectvalues3](https://github.com/vahidhedayati/testbo/blob/master/grails-app/views/test/definedselectvalues3.gsp)
+
+[select 1 relation](https://github.com/vahidhedayati/testbo/blob/master/grails-app/views/test/index.gsp)
+
+[select 2 relations](https://github.com/vahidhedayati/testbo/blob/master/grails-app/views/test/index2.gsp)
+
+[multidomainexample](https://github.com/vahidhedayati/testbo/blob/master/grails-app/views/test/multidomainexample.gsp)
+
+[multimultidomainexample](https://github.com/vahidhedayati/testbo/blob/master/grails-app/views/test/multimultidomainexample.gsp)
+
+[no reference domain objects](https://github.com/vahidhedayati/testbo/blob/master/grails-app/views/test/noref.gsp)
+
+[no reference primary object](https://github.com/vahidhedayati/testbo/blob/master/grails-app/views/test/norefprimary.gsp)
+
+[noref selection to next element](https://github.com/vahidhedayati/testbo/blob/master/grails-app/views/test/norefselectionext.gsp)
+
+[selectautoComplete](https://github.com/vahidhedayati/testbo/blob/master/grails-app/views/test/selectautoComplete.gsp)
+
