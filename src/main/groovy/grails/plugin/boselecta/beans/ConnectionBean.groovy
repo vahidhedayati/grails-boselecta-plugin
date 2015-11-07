@@ -58,6 +58,12 @@ class ConnectionBean implements ClientSessions, Validateable {
 		//receivers nullable: true
 		job (nullable: false, validator:validateInput)
 		user(nullable: false, validator:validateInput)
+		appName(nullable:true)
+		addAppName(nullable:true)
+	}
+
+	static mapping = {
+		addAppName defaultValue: 'no'
 	}
 
 	static def validateInput={value,object,errors->
