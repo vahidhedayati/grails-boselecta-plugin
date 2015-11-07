@@ -35,6 +35,10 @@ Dependency Grails 2: (not released refer to testing Plugin below)
 ```
 [codebase for grails 2.X](https://github.com/vahidhedayati/grails-boselecta-plugin/tree/grails2)
 
+
+######[test site for grails 2](https://github.com/vahidhedayati/testbo)
+
+######[test site for grails 2](https://github.com/vahidhedayati/testbo)
 ###Latest updates (after video published):
 A further lock down has been introduced, with the assumption that most people will be looking up domain objects with single dependencies.
 This means, typically I expect an end user to map from continent to country to city and so on. So its one to one relationship between each object. For this reason the default call now only supports one relation, so:
