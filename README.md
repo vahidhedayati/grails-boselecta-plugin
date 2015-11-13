@@ -8,7 +8,7 @@ Grails plugin that uses default WebSocket technology to interact with your domai
 ##### AutoComplete input areas use HTML5 dataList, data for dataList provided by backend WebSocket Connection.
  
 
-#### [Walkthrough Video - youtube, Everything you need to know about boselecta](https://www.youtube.com/watch?v=CFPe9pSFJ3g)
+#### [Walkthrough Video - youtube, Everything you need to know about boselecta](https://www.youtube.com/watch?v=GGB7mtB9nWM)
   
   
 ![diagram](https://raw.githubusercontent.com/vahidhedayati/grails-boselecta-plugin/grails2/documentation/boselecta.png)
