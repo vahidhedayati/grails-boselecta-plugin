@@ -1,8 +1,6 @@
 
-<input type="text" name="${instance.id}" id="${instance.id}"  onclick="this.value='';clearAll('${instance.setId}');"
-onChange="<g:if test="${instance.autoCompleteToSelect }">actionThis(this.value, '${instance.setId}');</g:if>
-<g:else>updateList(this.value, '${instance.id}', '${instance.sdataList}', '${instance.setId}')</g:else>"
-  list="${instance.dataList}" name = "${instance.name}" placeholder="${instance.placeHolder ?: 'AutoComplete' }"/>
+<input type="text" name="${instance.name?:instance.id}" id="${instance.id}"  onclick="this.value='';clearAll('${instance.setId}');"
+  list="${instance.dataList}"  placeholder="${instance.placeHolder ?: 'AutoComplete' }" />
  
 <g:hiddenField name="${instance.hiddenField?:'HIDDEN_'}${instance.id}" value=""/>
 <g:hiddenField name="${instance.jsonField?:'JSON_'}${instance.id}" value=""/>
@@ -17,10 +15,17 @@ onChange="<g:if test="${instance.autoCompleteToSelect }">actionThis(this.value, 
 	function clearAll(setId) {
 		$("#"+setId).val('');
 	}
+
 	$('#${instance.id}').change(function(){
-    	var c =  $('#${instance.id}').val();
-    	$('#${instance.id}').val(getTextValue${instance.id}(c));
-    	$('#${instance.hiddenField?:'HIDDEN_'}${instance.id}').val(c);
+	    var c =  $("#${instance.dataList} option[value='" + $('#${instance.id}').val() + "']").attr('id');
+		$('#${instance.hiddenField?:'HIDDEN_'}${instance.id}').val(c);
+	    <g:if test="${instance.autoCompleteToSelect }">
+    	    actionThis(c, '${instance.setId}');
+    	</g:if>
+        <g:else>
+            updateList(c, '${instance.id}', '${instance.sdataList}', '${instance.setId}')
+        </g:else>
+
 	});
 	function getTextValue${instance.id}(c){
   		var listing = $('#${instance.dataList}');

@@ -79,8 +79,8 @@ class AutoCompleteService {
 		if (className) {
 			Class clazz = grailsApplication?.getDomainClass(className)?.clazz
 			def res = clazz.findAll()
-			results = res?.collect {[	'id': it."${collectField}", 'name': it."${searchField}" ,
-										 'resarray': [selected: it."${collectField}",  selectedText:it."${searchField}" ]]}?.unique()
+			results = res?.collect {['id': it."${collectField}", 'name': it."${searchField}" ,
+									 'resarray': [selected: it."${collectField}",  selectedText:it."${searchField}" ]]}?.unique()
 			return results
 		}
 	}
