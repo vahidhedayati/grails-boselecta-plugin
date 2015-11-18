@@ -152,26 +152,31 @@ function updateOtherView(jsonResult,cid, updateValue,format,appendName,appendVal
 	});
 }
 
-function updateAutoView(jsonResult, cId, setId, appendName, appendValue, updated, updateValue,
- nextValue,format, updateList) {
-
-	var dataList = document.getElementById(updateList);
+/*
+* This updateAutoView is socket response back
+* creates a dynamic options list back from what it receives from websockets
+* and puts it back into the data list
+*/
+function updateAutoView(jsonResult, cId, setId, appendName, appendValue, updated, updateValue, nextValue,format, updateList) {
+    var dataList = document.getElementById(updateList);
 	var input = document.getElementById(setId);
 	while (dataList.firstChild){
        dataList.removeChild(dataList.firstChild);
     }
 	jsonResult.forEach(function(item) {
         var option = document.createElement('option');
-        //if (format == "JSON") {
-        	 option.setAttribute('data-value', JSON.stringify(item.resarray));
-        //}
-        option.value = item.id
+        //if (format == "JSON") {}
+        option.setAttribute('data-value', JSON.stringify(item.resarray));
+        // option.value = item.id
+        option.id = item.id
+        option.value = item.name
+        //option.setAttribute('data-id', item.id);
+        //option.label= item.name;
         option.textContent = item.name;
-
         dataList.appendChild( option );
-       
     });
 } 
+
 
 
 function updateView(jsonResult, setId, appendName, appendValue, updated, updateValue, nextValue,format) {
@@ -207,14 +212,14 @@ function updateView(jsonResult, setId, appendName, appendValue, updated, updateV
 		}
 		
 		if (format == "JSON") {
-				opt.value = JSON.stringify(resarray);
-			}else{
-				opt.value = name;
-			}
+			opt.value = JSON.stringify(resarray);
+		}else{
+			opt.value = name;
+		}
 		opt.text=id
-			if (name==nextValue) {
-				opt.setAttribute('selected', true);
-			}
+		if (name==nextValue) {
+			opt.setAttribute('selected', true);
+		}
 		try {
 			rselect.add(opt, null)
 		} catch(ex) {
