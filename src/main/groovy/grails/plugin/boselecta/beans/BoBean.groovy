@@ -14,6 +14,8 @@ class BoBean implements Validateable{
 	String collectField
 	String bindid
 
+	String clazz
+
 	String domain2
 	String searchField2
 	String collectField2
@@ -37,6 +39,7 @@ class BoBean implements Validateable{
 	String noSelection
 	String dataList
 	String sdataList
+
 
 	def getDomainDepth() {
 		int dd = 1
@@ -133,7 +136,6 @@ class BoBean implements Validateable{
 	boolean loadPrimary = false
 
 
-
 	static constraints = {
 		max(nullable: true, blank: true)
 		order(nullable: true, blank: true)
@@ -149,7 +151,7 @@ class BoBean implements Validateable{
 		domainDepth(nullable: true, blank: true)
 		dataList(nullable: true, blank: true)
 		sdataList(nullable: true, blank: true)
-
+		clazz(nullable:true)
 		domain(nullable: true, blank: true)
 		searchField(nullable: true, blank: true)
 		collectField(nullable: true, blank: true)

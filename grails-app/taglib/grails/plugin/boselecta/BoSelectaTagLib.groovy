@@ -17,6 +17,9 @@ class BoSelectaTagLib extends ConfService implements ClientSessions {
 	def randService
 
 
+	def listActiveSockets = {
+		out << clientListenerService.listActiveSockets()
+	}
 	/*
 	 * Used in demo site to randomise username
 	 * and keep a stale randomised user through out gsp:
@@ -74,7 +77,7 @@ class BoSelectaTagLib extends ConfService implements ClientSessions {
 			loadTemplate(attrs,'genAutoComplete', bo)
 			//Select
 		}else{
-			def gsattrs=[optionKey: bo.collectField , optionValue: bo.searchField, id: bo.id, value: bo.value, name: bo.name]
+			def gsattrs=[optionKey:bo.collectField, optionValue:bo.searchField, id:bo.id, value:bo.value, name:bo.name, class:bo.clazz]
 			gsattrs['noSelection'] = attrs.noSelection
 			gsattrs['from'] = []
 			if (bo.loadPrimary && (bo.formatting != "JSON")) {
@@ -211,7 +214,7 @@ class BoSelectaTagLib extends ConfService implements ClientSessions {
 			loadTemplate(attrs,'genAutoComplete', map)
 			//select function
 		}else{
-			def gsattrs=[optionKey: collectField , optionValue: searchField, id: id, value: value, name: name]
+			def gsattrs=[optionKey:collectField, optionValue:searchField, id:id, value:value, name:name, class:attrs.class]
 			gsattrs['noSelection'] = attrs.noSelection
 			gsattrs['from'] = []
 			if (loadPrimary && (formatting != "JSON")) {

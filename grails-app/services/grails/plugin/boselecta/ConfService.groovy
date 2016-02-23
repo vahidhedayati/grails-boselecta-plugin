@@ -35,7 +35,7 @@ class ConfService implements UserSessions, GrailsApplicationAware {
 	}
 
 	public boolean destroyJobUser(String username) {
-		return jobUsers.remove(username) != null
+		return jobUsers?.remove(username) != null
 	}
 
 	boolean isConfigEnabled(String input) {

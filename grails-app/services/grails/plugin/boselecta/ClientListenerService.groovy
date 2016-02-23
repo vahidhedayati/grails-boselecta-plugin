@@ -1,5 +1,6 @@
 package grails.plugin.boselecta
 
+import grails.converters.JSON
 import grails.plugin.boselecta.interfaces.ClientSessions
 import grails.plugin.boselecta.beans.ConnectionBean
 import javax.websocket.ContainerProvider
@@ -9,6 +10,11 @@ public class ClientListenerService extends ConfService implements ClientSessions
 
 	static transactional = false
 	def randService
+
+	def listActiveSockets() {
+
+		return jobData as JSON
+	}
 
 	def sendArrayPM(Session userSession, String job,String message) {
 		jobNames.each { String cuser, Session crec ->
