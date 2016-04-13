@@ -24,7 +24,7 @@ BoSelecta can be incorporated to an existing grails app running ver 2>+. Support
 
 Dependency Grails 3:
 ```groovy
-    compile "org.grails.plugins:boselecta:3.0.3"
+    compile "org.grails.plugins:boselecta:3.0.4"
 ```
 [codebase for grails 3.X](https://github.com/vahidhedayati/grails-boselecta-plugin/)
 
