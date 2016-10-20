@@ -2,7 +2,7 @@ import grails.plugin.boselecta.BoSelectaEndpoint
 
 
 class BoselectaGrailsPlugin {
-    def version = "0.1"
+    def version = "0.2"
     def grailsVersion = "2.0 > *"
     def title = "BoSelecta: websocket multi-select/autoComplete domainClasses"
     def description = 'Default WebSocket used to query given domain classes with Unlimited depth of relationship + unlimited direct relationships. Either as dependent multi-select or autoComplete or maybe combination.'

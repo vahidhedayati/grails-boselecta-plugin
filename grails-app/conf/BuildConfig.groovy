@@ -16,7 +16,7 @@ grails.project.dependency.resolution = {
 	}
 
 	dependencies {
-		build ('javax.websocket:javax.websocket-api:1.0') { export = false }
+		 build('javax.websocket:javax.websocket-api:1.0')
 	}
 
 	plugins {

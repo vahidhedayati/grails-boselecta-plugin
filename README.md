@@ -29,9 +29,9 @@ Dependency Grails 3:
 [codebase for grails 3.X](https://github.com/vahidhedayati/grails-boselecta-plugin/)
 
      
-Dependency Grails 2: (not released refer to testing Plugin below)     
+Dependency Grails 2: 
 ```groovy
-	compile ":boselecta:0.1" 
+	compile ":boselecta:0.2"
 ```
 [codebase for grails 2.X](https://github.com/vahidhedayati/grails-boselecta-plugin/tree/grails2)
 
