@@ -2,9 +2,9 @@ Boselecta plugin
 =========
 
 ### Side note - similar / related projects
-- [ajaxdependancyselection (this)](https://github.com/vahidhedayati/ajaxdependancyselection)
+- [ajaxdependancyselection](https://github.com/vahidhedayati/ajaxdependancyselection)
 
-- [grails-boselecta-plugin](https://github.com/vahidhedayati/grails-boselecta-plugin)
+- [grails-boselecta-plugin (this)](https://github.com/vahidhedayati/grails-boselecta-plugin)
 
 Grails plugin that uses default WebSocket technology to interact with your domainClasses and produce dependent form / options that depend on one another. The format to define select functionality / auto complete are identical. Auto complete requires additional boolean values to be passed to make it auto complete.
 
